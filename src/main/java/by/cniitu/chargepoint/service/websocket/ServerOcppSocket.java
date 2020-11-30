@@ -10,6 +10,7 @@ import eu.chargetime.ocpp.model.core.IdTagInfo;
 import eu.chargetime.ocpp.model.core.RegistrationStatus;
 import eu.chargetime.ocpp.model.reservation.CancelReservationStatus;
 import eu.chargetime.ocpp.model.reservation.ReservationStatus;
+import lombok.Getter;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -23,10 +24,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
 @Service
-public class ServerSocket extends WebSocketServer {
+public class ServerOcppSocket extends WebSocketServer {
 
-    public ServerSocket(@Value("${websocket.port}") int port) {
+    @Getter
+    private static ServerOcppSocket serverOcppSocket;
+
+    public ServerOcppSocket(@Value("${websocket.ocpp.port}") int port) {
         super(new InetSocketAddress(port));
+        serverOcppSocket = this;
     }
 
     @PostConstruct
@@ -36,7 +41,7 @@ public class ServerSocket extends WebSocketServer {
 
     @Override
     public void onStart() {
-        System.out.println("Socket onStart");
+        System.out.println("ServerOcppSocket onStart");
     }
 
     @Override
@@ -52,6 +57,9 @@ public class ServerSocket extends WebSocketServer {
     @Override
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
         System.out.println("Socket onClose " + webSocket);
+
+        // TODO charge point is off
+
     }
 
     @Override
@@ -100,6 +108,8 @@ public class ServerSocket extends WebSocketServer {
         if (s.contains("StopTransaction")) {
             sendStopTransactionResponse(webSocket, s);
         }
+
+        // TODO update information about charge points and just save it
 
     }
 
