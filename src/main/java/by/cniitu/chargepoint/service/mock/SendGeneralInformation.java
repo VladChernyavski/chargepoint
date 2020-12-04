@@ -16,12 +16,13 @@ public class SendGeneralInformation extends Thread {
     static Map<String, String> nextStatus = new HashMap<>();
 
     static{
-        nextStatus.put("reserved", "service");
+        nextStatus.put("alert", "service");
         nextStatus.put("service", "build");
         nextStatus.put("build", "busy");
         nextStatus.put("busy", "work");
         nextStatus.put("work", "connected");
         nextStatus.put("connected", "reserved");
+        nextStatus.put("reserved", "alert");
     }
 
 
@@ -36,8 +37,7 @@ public class SendGeneralInformation extends Thread {
 
                 new MapPoint(2, new Properties("заправка 2", "27.733612060546875, 53.97305115985005", "01:00 - 24:00"),
                         Arrays.asList(new Connector(1, "service", "standard", "12kW"),
-                                new Connector(2, "service", "super speed", "25kW"),
-                                new Connector(3, "service", "super puper speed", "100kW")),
+                                new Connector(2, "service", "super speed", "25kW")),
                         new Geometry("Point", Arrays.asList(27.733612060546875, 53.97305115985005))),
 
                 new MapPoint(3, new Properties("заправка 3", "27.540664672851562, 53.893819129552305", "06:00 - 24:00"),
@@ -57,8 +57,7 @@ public class SendGeneralInformation extends Thread {
 
                 new MapPoint(6, new Properties("заправка 6", "27.805709838867188, 53.879654718999255", "06:00 - 24:00"),
                         Arrays.asList(new Connector(1, "service", "super puper speed", "100kW"),
-                                new Connector(2, "service", "super puper speed", "100kW"),
-                                new Connector(3, "service", "super puper speed", "100kW")),
+                                new Connector(2, "service", "super puper speed", "100kW")),
                         new Geometry("Point", Arrays.asList(27.805709838867188, 53.879654718999255))),
 
                 new MapPoint(7, new Properties("заправка 7", "27.743911743164062, 53.814841989541314", "00:00 - 24:00"),
@@ -78,8 +77,7 @@ public class SendGeneralInformation extends Thread {
 
                 new MapPoint(10, new Properties("заправка 10", "27.384109497070312, 53.91930297491356", "00:00 - 24:00"),
                         Arrays.asList(new Connector(1, "work", "standard", "12kW"),
-                                new Connector(2, "work", "super speed", "25kW"),
-                                new Connector(3, "service", "super puper speed", "100kW")),
+                                new Connector(2, "work", "super speed", "25kW")),
                         new Geometry("Point", Arrays.asList(27.384109497070312, 53.91930297491356))),
 
                 new MapPoint(11, new Properties("заправка 11", "27.522811889648438, 53.960933558166715", "01:00 - 24:00"),
@@ -98,8 +96,7 @@ public class SendGeneralInformation extends Thread {
 
                 new MapPoint(14, new Properties("заправка 14", "27.587356567382812, 53.86589040962872", "01:00 - 24:00"),
                         Arrays.asList(new Connector(1, "service", "standard", "12kW"),
-                                new Connector(2, "service", "super speed", "25kW"),
-                                new Connector(3, "service", "super puper speed", "100kW")),
+                                new Connector(2, "service", "super speed", "25kW")),
                         new Geometry("Point", Arrays.asList(27.587356567382812, 53.86589040962872))),
 
                 new MapPoint(15, new Properties("заправка 15", "27.475433349609375, 53.93830460778626", "06:00 - 24:00"),
@@ -118,8 +115,7 @@ public class SendGeneralInformation extends Thread {
 
                 new MapPoint(18, new Properties("заправка 18", "27.620315551757812, 53.94396299650727", "06:00 - 24:00"),
                         Arrays.asList(new Connector(1, "service", "super puper speed", "100kW"),
-                                new Connector(2, "service", "super puper speed", "100kW"),
-                                new Connector(3, "service", "super puper speed", "100kW")),
+                                new Connector(2, "service", "super puper speed", "100kW")),
                         new Geometry("Point", Arrays.asList(27.620315551757812, 53.94396299650727))),
 
                 new MapPoint(19, new Properties("заправка 19", "27.642288208007812, 53.91040562094631", "00:00 - 24:00"),
@@ -138,8 +134,7 @@ public class SendGeneralInformation extends Thread {
 
                 new MapPoint(22, new Properties("заправка 22", "27.49465942382812, 53.84199453239005", "00:00 - 24:00"),
                         Arrays.asList(new Connector(1, "work", "standard", "12kW"),
-                                new Connector(2, "work", "super speed", "25kW"),
-                                new Connector(3, "service", "super puper speed", "100kW")),
+                                new Connector(2, "work", "super speed", "25kW")),
                         new Geometry("Point", Arrays.asList(27.49465942382812, 53.84199453239005))),
 
                 new MapPoint(23, new Properties("заправка 23", "27.651901245117188, 53.86386586440115", "01:00 - 24:00"),
@@ -159,8 +154,7 @@ public class SendGeneralInformation extends Thread {
 
                 new MapPoint(26, new Properties("заправка 26", "27.737045288085938, 53.93102840881328", "01:00 - 24:00"),
                         Arrays.asList(new Connector(1, "service", "standard", "12kW"),
-                                new Connector(2, "service", "super speed", "25kW"),
-                                new Connector(3, "service", "super puper speed", "100kW")),
+                                new Connector(2, "service", "super speed", "25kW")),
                         new Geometry("Point", Arrays.asList(27.737045288085938, 53.93102840881328))),
 
                 new MapPoint(27, new Properties("заправка 27", "27.739791870117188, 53.882892721712686", "06:00 - 24:00"),
@@ -180,8 +174,7 @@ public class SendGeneralInformation extends Thread {
 
                 new MapPoint(30, new Properties("заправка 30", "27.34840393066406, 53.880059483052605", "06:00 - 24:00"),
                         Arrays.asList(new Connector(1, "service", "super puper speed", "100kW"),
-                                new Connector(2, "service", "super puper speed", "100kW"),
-                                new Connector(3, "service", "super puper speed", "100kW")),
+                                new Connector(2, "service", "super puper speed", "100kW")),
                         new Geometry("Point", Arrays.asList(27.34840393066406, 53.880059483052605))));
 
 
