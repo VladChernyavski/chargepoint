@@ -2,12 +2,17 @@ package by.cniitu.chargepoint.web.controller;
 
 import by.cniitu.chargepoint.model.ChargePoint;
 import by.cniitu.chargepoint.model.request.*;
+import by.cniitu.chargepoint.model.web.MapPoint;
+import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
 import by.cniitu.chargepoint.util.JsonUtil;
 import org.java_websocket.WebSocket;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
 import java.util.UUID;
+import java.util.List;
 
 @RestController
 @RequestMapping("/chargepoint/{id}")
@@ -270,6 +275,37 @@ public class ChargePointController {
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
         return ResponseEntity.ok().build();
+    }
+
+    // TODO get real tariffs
+    @GetMapping("/tariffs")
+    public ResponseEntity<Object> getTariffs(@PathVariable int id){
+
+        ResponseEntity<Object> result = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"id is not found\"}");
+
+        for(MapPoint mapPoint : ServerWebSocket.mapPoints){
+            if(mapPoint.getId() == id){
+
+                double tariff;
+
+                if(id % 2 == 0){
+                    tariff = 2.28;
+                } else {
+                    tariff = 36.6;
+                }
+
+                List<Double> tariffs = new LinkedList<>();
+
+                for(int i = 0; i < mapPoint.getConnectors().size(); i++){
+                    tariffs.add(tariff);
+                }
+
+                result = ResponseEntity.ok(tariffs);
+
+            }
+        }
+
+        return result;
     }
 
     private Object[] getRequestObject(Object... objects) {
