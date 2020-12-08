@@ -29,9 +29,9 @@ public class UserController {
     @Autowired
     private JwtProvider jwtProvider;
 
-    @PostMapping("/register")
-    public ResponseEntity<Object> registerUserByEmail(@RequestBody RegisterRequest registerRequest) {
-        User noConfirmUser = getUserByClaims(registerRequest.getToken(), "registerbyemail");
+    @PostMapping("/registerbyemail")
+    public ResponseEntity<Object> registerUserByEmail(@RequestBody RegisterRequest request) {
+        User noConfirmUser = getUserByClaims(request.getToken(), "registerbyemail");
 
         if (Objects.isNull(noConfirmUser)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -54,10 +54,10 @@ public class UserController {
         return ResponseEntity.ok("{\"message\": \"Your email is confirmed\"}");
     }
 
-    //TODO
+    //TODO перенаправоения для ввода кода подтверждения
     @PostMapping("/registerbyphone")
-    public ResponseEntity<Object> registerUserByPhone(@RequestBody RegisterRequest registerRequest) {
-        User noConfirmUser = getUserByClaims(registerRequest.getToken(), "registerbyphone");
+    public ResponseEntity<Object> registerUserByPhone(@RequestBody RegisterRequest request) {
+        User noConfirmUser = getUserByClaims(request.getToken(), "registerbyphone");
 
         if (Objects.isNull(noConfirmUser)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -97,7 +97,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    //TODO confirm phone number
     @PostMapping("/authbyphone")
     public ResponseEntity<AuthResponsePhone> authByPhoneNumber(@RequestBody AuthRequest request ){
         User user = getUserByClaims(request.getToken(), "authByPhone");
