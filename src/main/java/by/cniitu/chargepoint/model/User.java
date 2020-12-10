@@ -39,4 +39,7 @@ public class User {
     @Column(name = "birthday")
     private LocalDate birthday;
 
+    @Column(name = "email_confirmed")
+    private Boolean emailConfirmed;
+
 }

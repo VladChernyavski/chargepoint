@@ -18,6 +18,7 @@ import java.util.List;
 @RequestMapping("/chargepoint/{id}")
 public class ChargePointController {
 
+    @CrossOrigin("*")
     @PostMapping("/reservenow")
     public ResponseEntity<Object> reserveNow(@PathVariable int id, @RequestBody ReserveNowRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -31,6 +32,7 @@ public class ChargePointController {
         return ResponseEntity.ok().build();
     }
 
+    @CrossOrigin("*")
     @PostMapping("/cancelreservation")
     public ResponseEntity<Object> cancelReservation(@PathVariable int id, @RequestBody CancelReservationRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -46,6 +48,7 @@ public class ChargePointController {
 
     // TODO charge point not support
     @PostMapping("/changeavailability")
+    @CrossOrigin("*")
     public ResponseEntity<Object> changeAvailability(@PathVariable int id, @RequestBody ChangeAvailabilityRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -60,6 +63,7 @@ public class ChargePointController {
 
     // TODO charge point not support
     @PostMapping("/changeconfiguration")
+    @CrossOrigin("*")
     public ResponseEntity<Object> changeConfiguration(@PathVariable int id, @RequestBody ChangeConfigurationRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -74,6 +78,7 @@ public class ChargePointController {
 
     // TODO charge point not support
     @PostMapping("/clearcache")
+    @CrossOrigin("*")
     public ResponseEntity<Object> clearCache(@PathVariable int id, @RequestBody ClearCacheRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -88,6 +93,7 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/clearchargingprofile")
+    @CrossOrigin("*")
     public ResponseEntity<Object> clearChargingProfile(@PathVariable int id, @RequestBody ClearChargingProfileRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -101,6 +107,7 @@ public class ChargePointController {
     }
 
     @PostMapping("/datatransfer")
+    @CrossOrigin("*")
     public ResponseEntity<Object> dataTransfer(@PathVariable int id, @RequestBody DataTransferRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -115,6 +122,7 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/getcompositeschedule")
+    @CrossOrigin("*")
     public ResponseEntity<Object> getCompositeSchedule(@PathVariable int id, @RequestBody GetCompositeScheduleRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -129,6 +137,7 @@ public class ChargePointController {
 
     // TODO charge point not support
     @PostMapping("/getconfiguration")
+    @CrossOrigin("*")
     public ResponseEntity<Object> getConfiguration(@PathVariable int id, @RequestBody GetConfigurationRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -143,6 +152,7 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/getdiagnostics")
+    @CrossOrigin("*")
     public ResponseEntity<Object> getDiagnostics(@PathVariable int id, @RequestBody GetDiagnosticsRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -157,6 +167,7 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/getlocallistversion")
+    @CrossOrigin("*")
     public ResponseEntity<Object> getLocalListVersion(@PathVariable int id, @RequestBody GetLocalListVersionRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -170,6 +181,7 @@ public class ChargePointController {
     }
 
     @PostMapping("/remotestarttransaction")
+    @CrossOrigin("*")
     public ResponseEntity<Object> remoteStartTransaction(@PathVariable int id, @RequestBody RemoteStartTransactionRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -183,6 +195,7 @@ public class ChargePointController {
     }
 
     @PostMapping("/remotestoptransaction")
+    @CrossOrigin("*")
     public ResponseEntity<Object> remoteStopTransaction(@PathVariable int id, @RequestBody RemoteStopTransactionRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -196,6 +209,7 @@ public class ChargePointController {
     }
 
     @PostMapping("/reset")
+    @CrossOrigin("*")
     public ResponseEntity<Object> reset(@PathVariable int id, @RequestBody ResetRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -210,6 +224,7 @@ public class ChargePointController {
 
     // TODO test
     @PostMapping("/sendlocallist")
+    @CrossOrigin("*")
     public ResponseEntity<Object> sendLocalList(@PathVariable int id, @RequestBody SendLocalListRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -224,6 +239,7 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/setchargingprofile")
+    @CrossOrigin("*")
     public ResponseEntity<Object> setChargingProfile(@PathVariable int id, @RequestBody SetChargingProfileRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -238,6 +254,7 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/triggermessage")
+    @CrossOrigin("*")
     public ResponseEntity<Object> triggerMessage(@PathVariable int id, @RequestBody TriggerMessageRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -251,6 +268,7 @@ public class ChargePointController {
     }
 
     @PostMapping("/unlockconnector")
+    @CrossOrigin("*")
     public ResponseEntity<Object> unlockConnector(@PathVariable int id, @RequestBody UnlockConnectorRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -265,6 +283,7 @@ public class ChargePointController {
 
     // TODO test
     @PostMapping("/updatefirmware")
+    @CrossOrigin("*")
     public ResponseEntity<Object> updateFirmware(@PathVariable int id, @RequestBody UpdateFirmwareRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 

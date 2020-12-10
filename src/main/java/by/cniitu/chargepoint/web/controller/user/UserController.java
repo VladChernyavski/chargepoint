@@ -29,48 +29,68 @@ public class UserController {
     @Autowired
     private JwtProvider jwtProvider;
 
-    @PostMapping("/registerbyemail")
-    public ResponseEntity<Object> registerUserByEmail(@RequestBody RegisterRequest request) {
-        User noConfirmUser = getUserByClaims(request.getToken(), "registerbyemail");
-
-        if (Objects.isNull(noConfirmUser)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        if (userService.isEmailExist(noConfirmUser.getEmail())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"User with such email exists\"}");
-        }
-
-        MailThreadExecutorUtil.execute(() -> userService.confirmUserByEmail(noConfirmUser));
-        return ResponseEntity.ok("{\"message\": \"Ok. Check your email please\"}");
-    }
+//    @PostMapping("/registerbyemail")
+//    public ResponseEntity<Object> registerUserByEmail(@RequestBody RegisterRequest request) {
+//        User noConfirmUser = getUserByClaims(request.getToken(), "registerbyemail");
+//
+//        if (Objects.isNull(noConfirmUser)){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        }
+//        if (userService.isEmailExist(noConfirmUser.getEmail())){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"User with such email exists\"}");
+//        }
+//
+//        MailThreadExecutorUtil.execute(() -> userService.confirmUserByEmail(noConfirmUser));
+//        return ResponseEntity.ok("{\"message\": \"Ok. Check your email please\"}");
+//    }
 
     @GetMapping("/activate/{code}")
     public ResponseEntity<String> activate(@PathVariable String code) {
-        User newUser = UserUtil.getUserByParseCode(code);
-        if (newUser == null) {
+        User confirmedEmailUser = UserUtil.getUserByParseCode(code);
+        if (confirmedEmailUser == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Your link is invalid\"}");
         }
-        userService.create(newUser);
+        User user = userService.findUserByPhoneNumber(confirmedEmailUser.getPhoneNumber());
+        user.setEmailConfirmed(true);
+        userService.create(user); // the same as save
         return ResponseEntity.ok("{\"message\": \"Your email is confirmed\"}");
     }
 
-    //TODO перенаправоения для ввода кода подтверждения
-    @PostMapping("/registerbyphone")
-    public ResponseEntity<Object> registerUserByPhone(@RequestBody RegisterRequest request) {
-        User noConfirmUser = getUserByClaims(request.getToken(), "registerbyphone");
+//    //TODO перенаправоения для ввода кода подтверждения
+//    @PostMapping("/registerbyphone")
+//    public ResponseEntity<Object> registerUserByPhone(@RequestBody RegisterRequest request) {
+//        User noConfirmUser = getUserByClaims(request.getToken(), "registerbyphone");
+//
+//        if (Objects.isNull(noConfirmUser)){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        }
+//        if (userService.isPhoneNumberExist(noConfirmUser.getPhoneNumber())){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"User with such phoneNumber exists\"}");
+//        }
+//
+//        MailThreadExecutorUtil.execute(() -> userService.confirmUserByPhone(noConfirmUser));
+//        return ResponseEntity.ok("{\"message\": \"Ok. Check your phone please\"}");
+//    }
 
+    @PostMapping("/register")
+    @CrossOrigin("*")
+    public ResponseEntity<Object> registerUserByPhone(@RequestBody RegisterRequest request) {
+        User noConfirmUser = getUserByClaims(request.getToken(), "register");
         if (Objects.isNull(noConfirmUser)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Error\"}");
         }
         if (userService.isPhoneNumberExist(noConfirmUser.getPhoneNumber())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"User with such phoneNumber exists\"}");
         }
-
+        if (userService.isEmailExist(noConfirmUser.getEmail())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"User with such email exists\"}");
+        }
         MailThreadExecutorUtil.execute(() -> userService.confirmUserByPhone(noConfirmUser));
         return ResponseEntity.ok("{\"message\": \"Ok. Check your phone please\"}");
     }
 
     @PostMapping("/activate")
+    @CrossOrigin("*")
     public ResponseEntity<String> activate(@RequestBody RegisterCodeRequest request){
         int code = request.getCode();
         User newUser = UserUtil.noConfirmedUsers.get(code);
@@ -84,30 +104,30 @@ public class UserController {
     }
 
     @PostMapping("/authbyemail")
-    public ResponseEntity<AuthResponseEmail> authByEmail(@RequestBody AuthRequest request ){
+    @CrossOrigin("*")
+    public ResponseEntity<AuthResponse> authByEmail(@RequestBody AuthRequest request ){
         User user = getUserByClaims(request.getToken(), "authByEmail");
 
         if (Objects.isNull(user)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String token = jwtProvider.generateToken(user.getEmail(), user.getPassword());
-        AuthResponseEmail response = new AuthResponseEmail(user.getId(), token, user.getEmail(),
-                user.getFirstName(), user.getLastName(),
-                user.getGender().toString(), user.getBirthday().toString());
+        AuthResponse response = new AuthResponse(user.getId(), token, user.getPhoneNumber(), user.getEmail(), user.getFirstName(),
+                user.getLastName(), user.getGender().toString(), user.getBirthday().toString(), user.getEmailConfirmed());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/authbyphone")
-    public ResponseEntity<AuthResponsePhone> authByPhoneNumber(@RequestBody AuthRequest request ){
+    @CrossOrigin("*")
+    public ResponseEntity<AuthResponse> authByPhoneNumber(@RequestBody AuthRequest request ){
         User user = getUserByClaims(request.getToken(), "authByPhone");
 
         if (Objects.isNull(user)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String token = jwtProvider.generateToken(user.getPhoneNumber(), user.getPassword());
-        AuthResponsePhone response = new AuthResponsePhone(user.getId(), token, user.getPhoneNumber(),
-                user.getFirstName(), user.getLastName(),
-                user.getGender().toString(), user.getBirthday().toString());
+        AuthResponse response = new AuthResponse(user.getId(), token, user.getPhoneNumber(), user.getEmail(), user.getFirstName(),
+                user.getLastName(), user.getGender().toString(), user.getBirthday().toString(), user.getEmailConfirmed());
         return ResponseEntity.ok(response);
     }
 
@@ -127,15 +147,48 @@ public class UserController {
             String password = claims.get("password").toString();
             user = userService.findByPhoneNumberAndPassword(email, password);
         }
-        if (method.equals("registerbyemail")){
+//        if (method.equals("registerbyemail")){
+//            String email = claims.get("email").toString();
+//            String firstName = claims.get("firstName").toString();
+//            String lastName = claims.get("lastName").toString();
+//            String gender = claims.get("gender").toString();
+//            String birthdate = claims.get("birthdate").toString();
+//            String password = claims.get("password").toString();
+//            user = new User();
+//            user.setEmail(email);
+//            user.setFirstName(firstName);
+//            user.setLastName(lastName);
+//            user.setGender(gender.equalsIgnoreCase(Gender.MALE.toString())
+//                    ? Gender.MALE : Gender.FEMALE);
+//            user.setBirthday(LocalDate.parse(birthdate));
+//            user.setPassword(password);
+//        }
+//        if (method.equals("registerbyphone")){
+//            String phone = claims.get("phoneNumber").toString();
+//            String firstName = claims.get("firstName").toString();
+//            String lastName = claims.get("lastName").toString();
+//            String gender = claims.get("gender").toString();
+//            String birthdate = claims.get("birthdate").toString();
+//            String password = claims.get("password").toString();
+//            user = new User();
+//            user.setPhoneNumber(phone);
+//            user.setFirstName(firstName);
+//            user.setLastName(lastName);
+//            user.setGender(gender.equalsIgnoreCase(Gender.MALE.toString())
+//                    ? Gender.MALE : Gender.FEMALE);
+//            user.setBirthday(LocalDate.parse(birthdate));
+//            user.setPassword(password);
+//        }
+        if (method.startsWith("register")){
+            String phone= claims.get("phoneNumber").toString();;
             String email = claims.get("email").toString();
             String firstName = claims.get("firstName").toString();
             String lastName = claims.get("lastName").toString();
             String gender = claims.get("gender").toString();
             String birthdate = claims.get("birthdate").toString();
             String password = claims.get("password").toString();
-
             user = new User();
+            user.setPhoneNumber(phone);
             user.setEmail(email);
             user.setFirstName(firstName);
             user.setLastName(lastName);
@@ -143,23 +196,7 @@ public class UserController {
                     ? Gender.MALE : Gender.FEMALE);
             user.setBirthday(LocalDate.parse(birthdate));
             user.setPassword(password);
-        }
-        if (method.equals("registerbyphone")){
-            String phone = claims.get("phoneNumber").toString();
-            String firstName = claims.get("firstName").toString();
-            String lastName = claims.get("lastName").toString();
-            String gender = claims.get("gender").toString();
-            String birthdate = claims.get("birthdate").toString();
-            String password = claims.get("password").toString();
-
-            user = new User();
-            user.setPhoneNumber(phone);
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            user.setGender(gender.equalsIgnoreCase(Gender.MALE.toString())
-                    ? Gender.MALE : Gender.FEMALE);
-            user.setBirthday(LocalDate.parse(birthdate));
-            user.setPassword(password);
+            user.setEmailConfirmed(false);
         }
         return user;
     }
