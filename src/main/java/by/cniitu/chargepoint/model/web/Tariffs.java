@@ -9,12 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Connector {
+public class Tariffs {
 
-    private Integer number;
-    private String status;
-    private String type;
-    private String power;
-    private Tariffs tariffs;
+    private Double charge;
+    private Double reserve;
 
 }
