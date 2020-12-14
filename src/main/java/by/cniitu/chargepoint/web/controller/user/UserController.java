@@ -143,9 +143,9 @@ public class UserController {
             user = userService.findByEmailAndPassword(email, password);
         }
         if (method.equals("authByPhone")) {
-            String email = claims.get("phoneNumber").toString();
+            String phoneNumber = claims.get("phoneNumber").toString();
             String password = claims.get("password").toString();
-            user = userService.findByPhoneNumberAndPassword(email, password);
+            user = userService.findByPhoneNumberAndPassword(phoneNumber, password);
         }
 //        if (method.equals("registerbyemail")){
 //            String email = claims.get("email").toString();
@@ -180,7 +180,7 @@ public class UserController {
 //            user.setPassword(password);
 //        }
         if (method.startsWith("register")){
-            String phone= claims.get("phoneNumber").toString();;
+            String phone= claims.get("phoneNumber").toString();
             String email = claims.get("email").toString();
             String firstName = claims.get("firstName").toString();
             String lastName = claims.get("lastName").toString();
