@@ -1,4 +1,4 @@
-package by.cniitu.chargepoint.model.web;
+package by.cniitu.chargepoint.model.web.map;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,6 +45,8 @@ public class MapPoint {
 
     private Integer id;
     private Properties properties;
+
+    // TODO change it to Map and make all the things to Andrey
     private List<Connector> connectors;
     private Geometry geometry;
 

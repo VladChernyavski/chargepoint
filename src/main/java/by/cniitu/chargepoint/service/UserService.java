@@ -1,16 +1,21 @@
 package by.cniitu.chargepoint.service;
 
 import by.cniitu.chargepoint.api.Smsc;
+import by.cniitu.chargepoint.model.Gender;
 import by.cniitu.chargepoint.model.User;
 import by.cniitu.chargepoint.repository.UserRepository;
 import by.cniitu.chargepoint.util.UserUtil;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.annotation.PostConstruct;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Random;
@@ -32,6 +37,11 @@ public class UserService {
 
     @Autowired
     private Smsc smsc;
+
+    @PostConstruct
+    public void postConstruct(){
+        System.out.println("passwordEncoder.encode(\"GvK8mQTy\") = " + passwordEncoder.encode("GvK8mQTy"));
+    }
 
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -65,6 +75,10 @@ public class UserService {
 
     public User create(User user) {
         return userRepository.save(prepareAndSave(user));
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
     public boolean isEmailExist(String email) {
@@ -116,11 +130,33 @@ public class UserService {
         if (user.getEmail() != null) {
             user.setEmail(user.getEmail().toLowerCase());
         }
-        if (user.getPhoneNumber() != null){
+        if (user.getPhoneNumber() != null) {
             user.setPhoneNumber(user.getPhoneNumber());
         }
         return user;
     }
 
+    public User getOne(Integer id){
+        return userRepository.getOne(id);
+    }
+
+    public User changeMoney(User user, Double amount){
+        user.setMoney(user.getMoney() + amount);
+        userRepository.save(user);
+        return user;
+    }
+
+    public void changeUserPassword(User user, String newPassword){
+        user.setPassword(passwordEncoder.encode(newPassword));
+        String email = user.getEmail();
+        String message = String.format("Hello, %s! \n" +
+                "Your password was changed. Your new password is %s", email, newPassword);
+        try {
+            mailService.send(email, "Your password was changed", message);
+        } catch (MailException e){
+            System.out.println(e.getMessage());
+        }
+        userRepository.save(user);
+    }
 
 }

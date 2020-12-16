@@ -1,7 +1,8 @@
 package by.cniitu.chargepoint.service.mock;
 
-import by.cniitu.chargepoint.model.web.*;
-import by.cniitu.chargepoint.model.web.Properties;
+import by.cniitu.chargepoint.model.web.map.Connector;
+import by.cniitu.chargepoint.model.web.map.MapPoint;
+import by.cniitu.chargepoint.model.web.WebInformation;
 import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
 import by.cniitu.chargepoint.util.JsonUtil;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,13 @@ public class SendGeneralInformation extends Thread {
         nextStatus.put("reserved", "alert");
     }
 
+    // ids of charge points the state of which can be changed only by user
+    static Set<Integer> normalChargePointIds = new HashSet<>();
+
+    static{
+        normalChargePointIds.add(1);
+        normalChargePointIds.add(2);
+    }
 
     @Override
     public void run() {
@@ -41,12 +49,12 @@ public class SendGeneralInformation extends Thread {
 
                     List<MapPoint> mapPointsUpdate = new LinkedList<>();
 
-                    int waitTime = 60000;
+                    int waitTime = 30000;
 
                     // update something and save it to mapPointsUpdate
-                    for (MapPoint mapPoint : ServerWebSocket.mapPoints) {
+                    for (MapPoint mapPoint : new LinkedList<>(ServerWebSocket.chargePointsMap.values())) {
                         int randomNum = random.nextInt(8); // 0 or 1
-                        if (randomNum == 0) {
+                        if (randomNum == 0 && !normalChargePointIds.contains(mapPoint.getId())) {
 
                             List<Connector> connectors = mapPoint.getConnectors();
                             int connectorNumber = random.nextInt(connectors.size()); // 0 or 1

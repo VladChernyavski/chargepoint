@@ -42,4 +42,7 @@ public class User {
     @Column(name = "email_confirmed")
     private Boolean emailConfirmed;
 
+    @Column(name = "money")
+    private Double money;
+
 }

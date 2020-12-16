@@ -1,5 +1,6 @@
 package by.cniitu.chargepoint.model.web;
 
+import by.cniitu.chargepoint.model.web.map.MapPoint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

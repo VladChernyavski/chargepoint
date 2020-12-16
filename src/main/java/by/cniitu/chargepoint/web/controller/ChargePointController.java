@@ -2,7 +2,8 @@ package by.cniitu.chargepoint.web.controller;
 
 import by.cniitu.chargepoint.model.ChargePoint;
 import by.cniitu.chargepoint.model.request.*;
-import by.cniitu.chargepoint.model.web.MapPoint;
+import by.cniitu.chargepoint.model.web.action.UserAction;
+import by.cniitu.chargepoint.model.web.map.MapPoint;
 import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
 import by.cniitu.chargepoint.util.JsonUtil;
 import org.java_websocket.WebSocket;
@@ -10,15 +11,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedList;
-import java.util.UUID;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/chargepoint/{id}")
+@CrossOrigin("*")
 public class ChargePointController {
 
-    @CrossOrigin("*")
     @PostMapping("/reservenow")
     public ResponseEntity<Object> reserveNow(@PathVariable int id, @RequestBody ReserveNowRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -29,10 +28,9 @@ public class ChargePointController {
         System.out.println("HTTP request (ReserveNow) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
-    @CrossOrigin("*")
     @PostMapping("/cancelreservation")
     public ResponseEntity<Object> cancelReservation(@PathVariable int id, @RequestBody CancelReservationRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -43,12 +41,11 @@ public class ChargePointController {
         System.out.println("HTTP request (CancelReservation) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO charge point not support
     @PostMapping("/changeavailability")
-    @CrossOrigin("*")
     public ResponseEntity<Object> changeAvailability(@PathVariable int id, @RequestBody ChangeAvailabilityRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -58,12 +55,11 @@ public class ChargePointController {
         System.out.println("HTTP request (ChangeAvailability) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO charge point not support
     @PostMapping("/changeconfiguration")
-    @CrossOrigin("*")
     public ResponseEntity<Object> changeConfiguration(@PathVariable int id, @RequestBody ChangeConfigurationRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -73,12 +69,11 @@ public class ChargePointController {
         System.out.println("HTTP request (ChangeConfiguration) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO charge point not support
     @PostMapping("/clearcache")
-    @CrossOrigin("*")
     public ResponseEntity<Object> clearCache(@PathVariable int id, @RequestBody ClearCacheRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -88,12 +83,11 @@ public class ChargePointController {
         System.out.println("HTTP request (ClearCache) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO not implemented by charge point
     @PostMapping("/clearchargingprofile")
-    @CrossOrigin("*")
     public ResponseEntity<Object> clearChargingProfile(@PathVariable int id, @RequestBody ClearChargingProfileRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -103,11 +97,10 @@ public class ChargePointController {
         System.out.println("HTTP request (ClearChargingProfile) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     @PostMapping("/datatransfer")
-    @CrossOrigin("*")
     public ResponseEntity<Object> dataTransfer(@PathVariable int id, @RequestBody DataTransferRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -117,12 +110,11 @@ public class ChargePointController {
         System.out.println("HTTP request (DataTransfer) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO not implemented by charge point
     @PostMapping("/getcompositeschedule")
-    @CrossOrigin("*")
     public ResponseEntity<Object> getCompositeSchedule(@PathVariable int id, @RequestBody GetCompositeScheduleRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -132,12 +124,11 @@ public class ChargePointController {
         System.out.println("HTTP request (GetCompositeSchedule) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO charge point not support
     @PostMapping("/getconfiguration")
-    @CrossOrigin("*")
     public ResponseEntity<Object> getConfiguration(@PathVariable int id, @RequestBody GetConfigurationRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -147,12 +138,11 @@ public class ChargePointController {
         System.out.println("HTTP request (GetConfiguration) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO not implemented by charge point
     @PostMapping("/getdiagnostics")
-    @CrossOrigin("*")
     public ResponseEntity<Object> getDiagnostics(@PathVariable int id, @RequestBody GetDiagnosticsRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -162,12 +152,11 @@ public class ChargePointController {
         System.out.println("HTTP request (GetDiagnostics) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO not implemented by charge point
     @PostMapping("/getlocallistversion")
-    @CrossOrigin("*")
     public ResponseEntity<Object> getLocalListVersion(@PathVariable int id, @RequestBody GetLocalListVersionRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -177,11 +166,10 @@ public class ChargePointController {
         System.out.println("HTTP request (GetLocalListVersion) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     @PostMapping("/remotestarttransaction")
-    @CrossOrigin("*")
     public ResponseEntity<Object> remoteStartTransaction(@PathVariable int id, @RequestBody RemoteStartTransactionRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -191,11 +179,10 @@ public class ChargePointController {
         System.out.println("HTTP request (RemoteStartTransaction) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     @PostMapping("/remotestoptransaction")
-    @CrossOrigin("*")
     public ResponseEntity<Object> remoteStopTransaction(@PathVariable int id, @RequestBody RemoteStopTransactionRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -205,11 +192,10 @@ public class ChargePointController {
         System.out.println("HTTP request (RemoteStopTransaction) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     @PostMapping("/reset")
-    @CrossOrigin("*")
     public ResponseEntity<Object> reset(@PathVariable int id, @RequestBody ResetRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -219,12 +205,11 @@ public class ChargePointController {
         System.out.println("HTTP request (Reset) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO test
     @PostMapping("/sendlocallist")
-    @CrossOrigin("*")
     public ResponseEntity<Object> sendLocalList(@PathVariable int id, @RequestBody SendLocalListRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -234,12 +219,11 @@ public class ChargePointController {
         System.out.println("HTTP request (SendLocalList) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO not implemented by charge point
     @PostMapping("/setchargingprofile")
-    @CrossOrigin("*")
     public ResponseEntity<Object> setChargingProfile(@PathVariable int id, @RequestBody SetChargingProfileRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -249,12 +233,11 @@ public class ChargePointController {
         System.out.println("HTTP request (SetChargingProfile) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO not implemented by charge point
     @PostMapping("/triggermessage")
-    @CrossOrigin("*")
     public ResponseEntity<Object> triggerMessage(@PathVariable int id, @RequestBody TriggerMessageRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -264,11 +247,10 @@ public class ChargePointController {
         System.out.println("HTTP request (TriggerMessage) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     @PostMapping("/unlockconnector")
-    @CrossOrigin("*")
     public ResponseEntity<Object> unlockConnector(@PathVariable int id, @RequestBody UnlockConnectorRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -278,12 +260,11 @@ public class ChargePointController {
         System.out.println("HTTP request (UnlockConnector) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO test
     @PostMapping("/updatefirmware")
-    @CrossOrigin("*")
     public ResponseEntity<Object> updateFirmware(@PathVariable int id, @RequestBody UpdateFirmwareRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
 
@@ -293,7 +274,7 @@ public class ChargePointController {
         System.out.println("HTTP request (UpdateFirmware) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
     // TODO get real tariffs
@@ -302,7 +283,7 @@ public class ChargePointController {
 
         ResponseEntity<Object> result = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"id is not found\"}");
 
-        for(MapPoint mapPoint : ServerWebSocket.mapPoints){
+        for(MapPoint mapPoint : new LinkedList<>(ServerWebSocket.chargePointsMap.values())){
             if(mapPoint.getId() == id){
 
                 double tariff;
@@ -331,6 +312,38 @@ public class ChargePointController {
         Object[] requestObject = new Object[objects.length];
         System.arraycopy(objects, 0, requestObject, 0, requestObject.length);
         return requestObject;
+    }
+
+    // TODO finish
+    // @PostMapping("/changeState/{chargeId}/{conId}/{state}")
+    // public ResponseEntity<Object> changeState(@PathVariable Integer chargeId, @PathVariable Integer conId, @PathVariable String state){
+    // }
+
+    static Set<String> actionSet = new HashSet<>();
+
+    static {
+        actionSet.add("charge");
+        actionSet.add("reserve");
+    }
+
+    Map<Integer, UserAction> userActionMap = new HashMap<>();
+
+    // TODO finish charge session if the energy is not changing
+
+    /**
+     * the start of charging or reserving process
+     * @param id - charge point id
+     * */
+    @PostMapping("/start/{action}/{conId}/{userId}")
+    public ResponseEntity<Object> start(@PathVariable Integer id, @PathVariable Integer conId,
+                                        @PathVariable String userId, @PathVariable String action) {
+
+        if(!actionSet.contains(action))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown action\"}");
+
+        // userActionMap.put(userId, )
+
+        return ResponseEntity.ok("{\"message\": \"action is theoretically started\"}");
     }
 
 }
