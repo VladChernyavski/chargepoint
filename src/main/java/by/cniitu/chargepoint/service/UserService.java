@@ -9,6 +9,8 @@ import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -17,10 +19,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.Random;
+import java.util.*;
 
 @Service
+@EnableScheduling
 public class UserService {
 
     @Autowired
@@ -157,6 +159,25 @@ public class UserService {
             System.out.println(e.getMessage());
         }
         userRepository.save(user);
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void deleteNoConfirmUsers() {
+        System.out.println("Call delete no confirm users method");
+
+        List<Integer> codesForRemove = new ArrayList<>();
+
+        for (Map.Entry<LocalDateTime, Integer> map : UserUtil.map.entrySet()) {
+            if(map.getKey().isBefore(LocalDateTime.now().minusMinutes(10))){
+                codesForRemove.add(map.getValue());
+            }
+        }
+
+        for (Integer i : codesForRemove){
+            UserUtil.noConfirmedUsers.remove(i);
+            UserUtil.map.entrySet().removeIf(v -> v.getValue().equals(i));
+        }
+
     }
 
 }

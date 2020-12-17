@@ -2,13 +2,21 @@ package by.cniitu.chargepoint.web.controller;
 
 import by.cniitu.chargepoint.model.ChargePoint;
 import by.cniitu.chargepoint.model.request.*;
+import by.cniitu.chargepoint.model.web.action.ChargeAction;
+import by.cniitu.chargepoint.model.web.action.ReserveAction;
 import by.cniitu.chargepoint.model.web.action.UserAction;
+import by.cniitu.chargepoint.model.web.action.UserActionTo;
+import by.cniitu.chargepoint.model.web.map.Connector;
 import by.cniitu.chargepoint.model.web.map.MapPoint;
+import by.cniitu.chargepoint.service.ChargePointService;
+import by.cniitu.chargepoint.service.UserActionService;
 import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
 import by.cniitu.chargepoint.util.JsonUtil;
 import org.java_websocket.WebSocket;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -16,7 +24,17 @@ import java.util.*;
 @RestController
 @RequestMapping("/chargepoint/{id}")
 @CrossOrigin("*")
+// TODO add more tokens to everything
 public class ChargePointController {
+
+    @Autowired
+    ChargePointService chargePointService;
+
+    @Autowired
+    ServerWebSocket serverWebSocket;
+
+    @Autowired
+    UserActionService userActionService;
 
     @PostMapping("/reservenow")
     public ResponseEntity<Object> reserveNow(@PathVariable int id, @RequestBody ReserveNowRequest request) {
@@ -283,7 +301,7 @@ public class ChargePointController {
 
         ResponseEntity<Object> result = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"id is not found\"}");
 
-        for(MapPoint mapPoint : new LinkedList<>(ServerWebSocket.chargePointsMap.values())){
+        for(MapPoint mapPoint : new LinkedList<>(ChargePointService.chargePointsMap.values())){
             if(mapPoint.getId() == id){
 
                 double tariff;
@@ -314,35 +332,75 @@ public class ChargePointController {
         return requestObject;
     }
 
-    // TODO finish
-    // @PostMapping("/changeState/{chargeId}/{conId}/{state}")
-    // public ResponseEntity<Object> changeState(@PathVariable Integer chargeId, @PathVariable Integer conId, @PathVariable String state){
-    // }
+    // TODO delete after development
+    // manually changing off connector state
+    @PostMapping("/status/{conId}/{status}")
+    public ResponseEntity<Object> status(@PathVariable Integer id, @PathVariable Integer conId,
+                                        @PathVariable String status) {
 
-    static Set<String> actionSet = new HashSet<>();
+        if(!ChargePointService.conStatuses.contains(status))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown status\"}");
 
-    static {
-        actionSet.add("charge");
-        actionSet.add("reserve");
+        Connector connector;
+        try {
+            connector = chargePointService.getConnector(id, conId);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
+        }
+
+        connector.setStatus(status);
+        Set<Integer> updatesIds = new HashSet<>();
+        updatesIds.add(id);
+        serverWebSocket.broadcastUpdate(updatesIds);
+        return ResponseEntity.ok("{\"message\": \"status is changed\"}");
     }
 
-    Map<Integer, UserAction> userActionMap = new HashMap<>();
-
-    // TODO finish charge session if the energy is not changing
-
     /**
-     * the start of charging or reserving process
+     * the start of charging process
+     * if the status of the connector is green (work) -> ask the user to connect the connector
+     * if the status of the connector is yellow (connected) -> start charging
+     * otherwise we cannot start charging
      * @param id - charge point id
      * */
-    @PostMapping("/start/{action}/{conId}/{userId}")
+    @PostMapping("/start/charge/{conId}/{userId}")
     public ResponseEntity<Object> start(@PathVariable Integer id, @PathVariable Integer conId,
-                                        @PathVariable String userId, @PathVariable String action) {
+                                        @PathVariable Integer userId, @RequestParam Double energy) throws Exception {
 
-        if(!actionSet.contains(action))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown action\"}");
+        // TODO check the existence of the user using database
 
-        // userActionMap.put(userId, )
+        Connector connector;
+        try {
+            connector = chargePointService.getConnector(id, conId);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
+        }
+        if (connector.getStatus().equals("work")) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("{\"message\": \"please connect the connector and try again\"}");
+        } else if (connector.getStatus().equals("connected")) {
 
+            UserActionTo userActionTo = new UserActionTo(id, conId, new ChargeAction(energy));
+            UserActionService.userActionMap.put(userId, userActionTo);
+
+            // TODO save start of transaction to database end somehow finish transaction
+            connector.setStatus("busy");
+            return ResponseEntity.ok("{\"message\": \"charging is started\", \"status\": \"ok\"}");
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \" charging process is now unavailable\"}");
+    }
+
+    /**
+     * the start of reserving process
+     * @param id - charge point id
+     * */
+    @PostMapping("/start/reserve/{conId}/{userId}")
+    public ResponseEntity<Object> start(@PathVariable Integer id, @PathVariable Integer conId,
+                                        @PathVariable Integer userId, @RequestBody ReserveAction reserveAction) {
+
+        // TODO check the existence of the user using database
+
+
+        // TODO save start of transaction to database end somehow finish transaction
         return ResponseEntity.ok("{\"message\": \"action is theoretically started\"}");
     }
 

@@ -20,4 +20,10 @@ public class Properties {
     private String address;
     private String worktime;
 
+    public Properties(Properties properties){
+        this.tittle = properties.tittle;
+        this.address = properties.address;
+        this.worktime = properties.worktime;
+    }
+
 }

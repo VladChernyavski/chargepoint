@@ -2,9 +2,8 @@ package by.cniitu.chargepoint.service.mock;
 
 import by.cniitu.chargepoint.model.web.map.Connector;
 import by.cniitu.chargepoint.model.web.map.MapPoint;
-import by.cniitu.chargepoint.model.web.WebInformation;
+import by.cniitu.chargepoint.service.ChargePointService;
 import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
-import by.cniitu.chargepoint.util.JsonUtil;
 import lombok.AllArgsConstructor;
 
 import java.util.*;
@@ -14,8 +13,11 @@ public class SendGeneralInformation extends Thread {
 
     ServerWebSocket serverWebSocket;
 
+    static int waitTime = 5000;
+
     static Map<String, String> nextStatus = new HashMap<>();
 
+    // TODO use ChargePointService.conStatuses
     static{
         nextStatus.put("alert", "service");
         nextStatus.put("service", "build");
@@ -30,8 +32,8 @@ public class SendGeneralInformation extends Thread {
     static Set<Integer> normalChargePointIds = new HashSet<>();
 
     static{
-        normalChargePointIds.add(1);
-        normalChargePointIds.add(2);
+        normalChargePointIds.add(31);
+        normalChargePointIds.add(32);
     }
 
     @Override
@@ -47,27 +49,23 @@ public class SendGeneralInformation extends Thread {
 
                 try {
 
-                    List<MapPoint> mapPointsUpdate = new LinkedList<>();
+                    Set<Integer> updatesIds = new HashSet<>();
 
-                    int waitTime = 30000;
-
-                    // update something and save it to mapPointsUpdate
-                    for (MapPoint mapPoint : new LinkedList<>(ServerWebSocket.chargePointsMap.values())) {
-                        int randomNum = random.nextInt(8); // 0 or 1
-                        if (randomNum == 0 && !normalChargePointIds.contains(mapPoint.getId())) {
-
-                            List<Connector> connectors = mapPoint.getConnectors();
-                            int connectorNumber = random.nextInt(connectors.size()); // 0 or 1
-                            Connector connector = mapPoint.getConnectors().get(connectorNumber);
+                    // update something
+                    for(Map.Entry<Integer, MapPoint> entry : ChargePointService.chargePointsMap.entrySet()){
+                        int randomNum = random.nextInt(8); // 0 <= x < 8
+                        Integer id = entry.getKey();
+                        if (randomNum == 0 && !normalChargePointIds.contains(id)) {
+                            Map<Integer, Connector> connectors = entry.getValue().getConnectors();
+                            int connectorNumber = random.nextInt(connectors.size()) + 1; // 1 or 2
+                            Connector connector = connectors.get(connectorNumber);
                             connector.setStatus(nextStatus.get(connector.getStatus()));
-                            mapPointsUpdate.add(mapPoint);
-
+                            updatesIds.add(id);
                         }
-
                     }
 
                     Thread.sleep(waitTime);
-                    serverWebSocket.broadcast(JsonUtil.getJsonString(new WebInformation("update", mapPointsUpdate)));
+                    serverWebSocket.broadcastUpdate(updatesIds);
 
 
                 } catch (InterruptedException e) {

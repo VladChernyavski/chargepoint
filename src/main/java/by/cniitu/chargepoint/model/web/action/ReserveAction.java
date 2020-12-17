@@ -1,21 +1,35 @@
 package by.cniitu.chargepoint.model.web.action;
 
 import by.cniitu.chargepoint.util.TimeUtil;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@Getter
 public class ReserveAction extends UserAction{
 
-    String totalTime = "";
-    Integer totalSeconds = 0;
-    String remainedTime = "";
+    String totalTime;
+    Integer totalSeconds;
+    String remainedTime;
+    String currentTime = "0:00";        // example : "01:23"
+    Integer currentSeconds = 0;         // example : 83
+    boolean shouldBeFinished = false;
 
     public void nextSecond(){
-        super.nextSecond();
+        currentTime = TimeUtil.secondsToString(currentSeconds++);
         remainedTime = TimeUtil.secondsToString(totalSeconds - currentSeconds);
+        if(shouldBeFinished()){
+            shouldBeFinished = true;
+        }
     }
 
-    public ReserveAction(ReserveAction reserveAction){
-        this.currentTime = reserveAction.currentTime;
-        this.currentSeconds = reserveAction.currentSeconds;
+    @Override
+    boolean shouldBeFinished() {
+        return shouldBeFinished || currentSeconds >= totalSeconds;
     }
 
+    @Override
+    void finish() {
+        shouldBeFinished = true;
+    }
 }

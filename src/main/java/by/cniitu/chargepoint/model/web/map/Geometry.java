@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /*
@@ -22,5 +23,10 @@ public class Geometry {
 
     private String type;
     private List<Double> coordinates;
+
+    public Geometry(Geometry geometry){
+        this.type = geometry.type;
+        this.coordinates = new LinkedList<>(geometry.coordinates);
+    }
 
 }

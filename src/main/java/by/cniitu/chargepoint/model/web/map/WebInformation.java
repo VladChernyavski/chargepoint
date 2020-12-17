@@ -1,4 +1,4 @@
-package by.cniitu.chargepoint.model.web;
+package by.cniitu.chargepoint.model.web.map;
 
 import by.cniitu.chargepoint.model.web.map.MapPoint;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.List;
 public class WebInformation {
 
     String type;
-    List<MapPoint> features;
+    List<MapPointTo> features;
 
 
 
