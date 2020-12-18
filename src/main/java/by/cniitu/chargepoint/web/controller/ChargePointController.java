@@ -4,19 +4,18 @@ import by.cniitu.chargepoint.model.ChargePoint;
 import by.cniitu.chargepoint.model.request.*;
 import by.cniitu.chargepoint.model.web.action.ChargeAction;
 import by.cniitu.chargepoint.model.web.action.ReserveAction;
-import by.cniitu.chargepoint.model.web.action.UserAction;
 import by.cniitu.chargepoint.model.web.action.UserActionTo;
 import by.cniitu.chargepoint.model.web.map.Connector;
 import by.cniitu.chargepoint.model.web.map.MapPoint;
 import by.cniitu.chargepoint.service.ChargePointService;
 import by.cniitu.chargepoint.service.UserActionService;
+import by.cniitu.chargepoint.service.enums.ConnectorStatus;
 import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
 import by.cniitu.chargepoint.util.JsonUtil;
 import org.java_websocket.WebSocket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -338,8 +337,9 @@ public class ChargePointController {
     public ResponseEntity<Object> status(@PathVariable Integer id, @PathVariable Integer conId,
                                         @PathVariable String status) {
 
-        if(!ChargePointService.conStatuses.contains(status))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown status\"}");
+        // TODO redu
+        //if(!ChargePointService.conStatuses.contains(status))
+        //    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown status\"}");
 
         Connector connector;
         try {
@@ -348,10 +348,9 @@ public class ChargePointController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
         }
 
-        connector.setStatus(status);
-        Set<Integer> updatesIds = new HashSet<>();
-        updatesIds.add(id);
-        serverWebSocket.broadcastUpdate(updatesIds);
+        // TODO check
+        connector.setStatus(ConnectorStatus.get(status));
+        serverWebSocket.broadcastUpdate(id);
         return ResponseEntity.ok("{\"message\": \"status is changed\"}");
     }
 
@@ -367,6 +366,7 @@ public class ChargePointController {
                                         @PathVariable Integer userId, @RequestParam Double energy) throws Exception {
 
         // TODO check the existence of the user using database
+        // TODO check the balance and save transactions even when the time was 0 (when the client had not enough money)
 
         Connector connector;
         try {
@@ -374,19 +374,19 @@ public class ChargePointController {
         } catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
         }
-        if (connector.getStatus().equals("work")) {
+        ConnectorStatus status = connector.getStatus();
+        if (status == ConnectorStatus.WORK) {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("{\"message\": \"please connect the connector and try again\"}");
-        } else if (connector.getStatus().equals("connected")) {
-
-            UserActionTo userActionTo = new UserActionTo(id, conId, new ChargeAction(energy));
-            UserActionService.userActionMap.put(userId, userActionTo);
+        } else if (status== ConnectorStatus.CONNECTED) {
+            UserActionService.userActionMap.put(userId, new UserActionTo(id, conId, new ChargeAction(energy)));
 
             // TODO save start of transaction to database end somehow finish transaction
-            connector.setStatus("busy");
+            connector.setStatus(ConnectorStatus.BUSY);
+            serverWebSocket.broadcastUpdate(id);
             return ResponseEntity.ok("{\"message\": \"charging is started\", \"status\": \"ok\"}");
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \" charging process is now unavailable\"}");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"charging process is now unavailable\"}");
     }
 
     /**
@@ -395,13 +395,28 @@ public class ChargePointController {
      * */
     @PostMapping("/start/reserve/{conId}/{userId}")
     public ResponseEntity<Object> start(@PathVariable Integer id, @PathVariable Integer conId,
-                                        @PathVariable Integer userId, @RequestBody ReserveAction reserveAction) {
+                                        @PathVariable Integer userId, @RequestParam Integer totalSeconds) throws Exception {
 
         // TODO check the existence of the user using database
+        // TODO check the balance and save transactions even when the time was 0 (when the client had not enough money)
 
+        Connector connector;
+        try {
+            connector = chargePointService.getConnector(id, conId);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
+        }
+        if (connector.getStatus() == ConnectorStatus.WORK) {
+            UserActionService.userActionMap.put(userId, new UserActionTo(id, conId, new ReserveAction(totalSeconds)));
+
+            // TODO save start of transaction to database end somehow finish transaction
+            connector.setStatus(ConnectorStatus.RESERVED);
+            serverWebSocket.broadcastUpdate(id);
+            return ResponseEntity.ok("{\"message\": \"reservation is started\", \"status\": \"ok\"}");
+        }
 
         // TODO save start of transaction to database end somehow finish transaction
-        return ResponseEntity.ok("{\"message\": \"action is theoretically started\"}");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"reservation process is now unavailable\"}");
     }
 
 }

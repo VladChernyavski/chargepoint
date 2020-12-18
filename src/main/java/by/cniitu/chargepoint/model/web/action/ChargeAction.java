@@ -27,6 +27,9 @@ public class ChargeAction extends UserAction{
         currentTime = TimeUtil.secondsToString(++currentSeconds);
         currentWats += 30;
         remainedEnergy = (totalEnergy * 1000 - currentWats)/1000;
+        if(remainedEnergy < 0){
+            remainedEnergy = 0d;
+        }
         currentEnergy = (double)currentWats/1000;
         if(shouldBeFinished()){
             shouldBeFinished = true;

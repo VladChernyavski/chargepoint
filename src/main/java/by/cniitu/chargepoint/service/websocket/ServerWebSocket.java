@@ -5,7 +5,6 @@ import by.cniitu.chargepoint.service.ChargePointService;
 import by.cniitu.chargepoint.service.mock.SendGeneralInformation;
 import by.cniitu.chargepoint.util.JsonUtil;
 import by.cniitu.chargepoint.util.MapUtil;
-import lombok.Getter;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -20,12 +19,9 @@ import java.util.stream.Collectors;
 @Service
 public class ServerWebSocket extends WebSocketServer {
 
-    @Getter
-    private static ServerWebSocket serverWebSocket;
 
     public ServerWebSocket(@Value("${websocket.web.port}") int port) {
         super(new InetSocketAddress(port));
-        serverWebSocket = this;
         new SendGeneralInformation(this).start();
     }
 
@@ -64,7 +60,7 @@ public class ServerWebSocket extends WebSocketServer {
 
         System.out.println("s = " + s);
 
-        Integer userId = -1;
+        int userId = -1;
 
         if(s.equals("givedata")){
             broadcast(JsonUtil.getJsonString(new WebInformation("data",
@@ -91,12 +87,20 @@ public class ServerWebSocket extends WebSocketServer {
 
     }
 
-    public void broadcastUpdate(Set<Integer> updatesIds){
+    public void broadcastUpdate(Set<Integer> updateIds){
 
         broadcast(JsonUtil.getJsonString(new WebInformation("update", MapUtil.MapPointListToMapPointToList(
                 new LinkedList<>(ChargePointService.chargePointsMap.entrySet().stream().filter(
-                        e -> updatesIds.contains(e.getKey())).collect(Collectors.toMap(
+                        e -> updateIds.contains(e.getKey())).collect(Collectors.toMap(
                                 Map.Entry::getKey, Map.Entry::getValue)).values())))));
+    }
+
+    public void broadcastUpdate(Integer updateId){
+
+        Set<Integer> updatesIds = new HashSet<>();
+        updatesIds.add(updateId);
+        broadcastUpdate(updatesIds);
+
     }
 
 }

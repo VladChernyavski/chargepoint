@@ -3,6 +3,7 @@ package by.cniitu.chargepoint.service.mock;
 import by.cniitu.chargepoint.model.web.map.Connector;
 import by.cniitu.chargepoint.model.web.map.MapPoint;
 import by.cniitu.chargepoint.service.ChargePointService;
+import by.cniitu.chargepoint.service.enums.ConnectorStatus;
 import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
 import lombok.AllArgsConstructor;
 
@@ -15,25 +16,27 @@ public class SendGeneralInformation extends Thread {
 
     static int waitTime = 5000;
 
-    static Map<String, String> nextStatus = new HashMap<>();
+    static Map<ConnectorStatus, ConnectorStatus> nextStatus = new HashMap<>();
 
-    // TODO use ChargePointService.conStatuses
     static{
-        nextStatus.put("alert", "service");
-        nextStatus.put("service", "build");
-        nextStatus.put("build", "busy");
-        nextStatus.put("busy", "work");
-        nextStatus.put("work", "connected");
-        nextStatus.put("connected", "reserved");
-        nextStatus.put("reserved", "alert");
+        nextStatus.put(ConnectorStatus.get(ConnectorStatus.count() - 1), ConnectorStatus.get(0));
+        for(int i = 0; i < ConnectorStatus.count() - 1; i++){
+            nextStatus.put(ConnectorStatus.get(i), ConnectorStatus.get(i + 1));
+        }
     }
 
     // ids of charge points the state of which can be changed only by user
     static Set<Integer> normalChargePointIds = new HashSet<>();
 
     static{
+
+        // Andrey
         normalChargePointIds.add(31);
         normalChargePointIds.add(32);
+
+        // Sandro
+        normalChargePointIds.add(11);
+        normalChargePointIds.add(12);
     }
 
     @Override

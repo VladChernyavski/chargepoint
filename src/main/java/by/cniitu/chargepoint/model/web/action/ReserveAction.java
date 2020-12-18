@@ -15,8 +15,13 @@ public class ReserveAction extends UserAction{
     Integer currentSeconds = 0;         // example : 83
     boolean shouldBeFinished = false;
 
+    public ReserveAction(Integer totalSeconds){
+        this.totalSeconds = totalSeconds;
+        remainedTime = totalTime = TimeUtil.secondsToString(totalSeconds);
+    }
+
     public void nextSecond(){
-        currentTime = TimeUtil.secondsToString(currentSeconds++);
+        currentTime = TimeUtil.secondsToString(++currentSeconds);
         remainedTime = TimeUtil.secondsToString(totalSeconds - currentSeconds);
         if(shouldBeFinished()){
             shouldBeFinished = true;

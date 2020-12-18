@@ -26,12 +26,8 @@ import java.util.Calendar;
 @Service
 public class ServerOcppSocket extends WebSocketServer {
 
-    @Getter
-    private static ServerOcppSocket serverOcppSocket;
-
     public ServerOcppSocket(@Value("${websocket.ocpp.port}") int port) {
         super(new InetSocketAddress(port));
-        serverOcppSocket = this;
     }
 
     @PostConstruct
@@ -186,6 +182,11 @@ public class ServerOcppSocket extends WebSocketServer {
         Object[] requestObject = JsonUtil.getObjectByJson(message);
         if (requestObject != null) {
             DataTransferUtilObject object = JsonUtil.getDataTransferObject(JsonUtil.getJsonString(requestObject[3]));
+            if(object == null){
+                response.setStatus(DataTransferStatus.Rejected);
+                webSocket.send(JsonUtil.getJsonString(getResponseObject(3, requestObject[1], response)));
+                return;
+            }
             if (object.getData() != null) {
                 response.setData(object.getData());
             }
