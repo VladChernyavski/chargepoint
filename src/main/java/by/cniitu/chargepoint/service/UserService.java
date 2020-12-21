@@ -40,11 +40,6 @@ public class UserService {
     @Autowired
     private Smsc smsc;
 
-    @PostConstruct
-    public void postConstruct(){
-        System.out.println("passwordEncoder.encode(\"GvK8mQTy\") = " + passwordEncoder.encode("GvK8mQTy"));
-    }
-
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }

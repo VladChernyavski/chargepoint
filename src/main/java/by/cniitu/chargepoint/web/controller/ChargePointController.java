@@ -376,7 +376,7 @@ public class ChargePointController {
         }
         ConnectorStatus status = connector.getStatus();
         if (status == ConnectorStatus.WORK) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("{\"message\": \"please connect the connector and try again\"}");
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("{\"message\": \"please connect the connector and try again\", \"status\": \"plug\"}");
         } else if (status== ConnectorStatus.CONNECTED) {
             UserActionService.userActionMap.put(userId, new UserActionTo(id, conId, new ChargeAction(energy)));
 
@@ -418,5 +418,7 @@ public class ChargePointController {
         // TODO save start of transaction to database end somehow finish transaction
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"reservation process is now unavailable\"}");
     }
+
+    // TODO make an end-point that gives existing types of connectors (Type2, J1772, ...)
 
 }
