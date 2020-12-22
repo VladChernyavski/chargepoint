@@ -45,4 +45,8 @@ public class User {
     @Column(name = "money")
     private Double money;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
 }

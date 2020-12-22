@@ -18,6 +18,7 @@ public class AuthResponse {
     private String gender;
     private String birthdate;
     private Boolean emailConfirmed;
+    private String role; // "admin" or "user"
 
 
 }

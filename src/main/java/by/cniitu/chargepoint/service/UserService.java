@@ -1,11 +1,9 @@
 package by.cniitu.chargepoint.service;
 
 import by.cniitu.chargepoint.api.Smsc;
-import by.cniitu.chargepoint.model.Gender;
 import by.cniitu.chargepoint.model.User;
 import by.cniitu.chargepoint.repository.UserRepository;
 import by.cniitu.chargepoint.util.UserUtil;
-import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
@@ -14,10 +12,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
+
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -39,6 +36,11 @@ public class UserService {
 
     @Autowired
     private Smsc smsc;
+
+    @PostConstruct
+    void postConstruct(){
+        System.out.println("passwordEncoder.encode(\"Cfif98Cfif\") = " + passwordEncoder.encode("Cfif98Cfif"));
+    }
 
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);

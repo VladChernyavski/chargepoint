@@ -75,13 +75,13 @@ public class UserController {
     @PostMapping("/authbyemail")
     public ResponseEntity<Object> authByEmail(@RequestBody AuthRequest request ){
         User user = getUserByClaims(request.getToken(), "authByEmail");
-
         if (Objects.isNull(user)){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"message\": \"Error\"}");
         }
         String token = jwtProvider.generateToken(user.getEmail(), user.getPassword());
         AuthResponse response = new AuthResponse(user.getId(), token, user.getPhoneNumber(), user.getEmail(), user.getFirstName(),
-                user.getLastName(), user.getGender().toString(), user.getBirthday().toString(), user.getEmailConfirmed());
+                user.getLastName(), user.getGender().toString(), user.getBirthday().toString(), user.getEmailConfirmed(),
+                user.getRole().getName());
         return ResponseEntity.ok(response);
     }
 
@@ -94,7 +94,8 @@ public class UserController {
         }
         String token = jwtProvider.generateToken(user.getPhoneNumber(), user.getPassword());
         AuthResponse response = new AuthResponse(user.getId(), token, user.getPhoneNumber(), user.getEmail(), user.getFirstName(),
-                user.getLastName(), user.getGender().toString(), user.getBirthday().toString(), user.getEmailConfirmed());
+                user.getLastName(), user.getGender().toString(), user.getBirthday().toString(), user.getEmailConfirmed(),
+                user.getRole().getName());
         return ResponseEntity.ok(response);
     }
 
