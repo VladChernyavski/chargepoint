@@ -1,14 +1,12 @@
 package by.cniitu.chargepoint.util;
 
-import by.cniitu.chargepoint.model.Gender;
-import by.cniitu.chargepoint.model.User;
+import by.cniitu.chargepoint.entity.Gender;
+import by.cniitu.chargepoint.entity.User;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserUtil {

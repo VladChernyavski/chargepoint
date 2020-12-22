@@ -1,6 +1,6 @@
 package by.cniitu.chargepoint.config.jwt;
 
-import by.cniitu.chargepoint.model.User;
+import by.cniitu.chargepoint.entity.User;
 import by.cniitu.chargepoint.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,7 +33,7 @@ public class JwtFilter extends GenericFilterBean {
         String token = getTokenFromRequest((HttpServletRequest) servletRequest);
         if (token != null && jwtProvider.validateToken(token)) {
             String userLogin = jwtProvider.getLoginFromToken(token);
-            User user = null;
+            User user;
             if(userLogin.contains("@")){
                 user = userService.findUserByEmail(userLogin);
             } else {

@@ -1,6 +1,9 @@
-package by.cniitu.chargepoint.model;
+package by.cniitu.chargepoint.entity;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -8,7 +11,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "user_roles")
 @Data
-@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class Role {
 
     @Id
@@ -18,5 +22,9 @@ public class Role {
     @Column(name = "name")
     private String name;
 
-
+    @Override
+    @JsonValue
+    public String toString(){
+        return name;
+    }
 }

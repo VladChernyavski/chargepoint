@@ -1,4 +1,4 @@
-package by.cniitu.chargepoint.model;
+package by.cniitu.chargepoint.entity;
 
 public enum  Gender {
 

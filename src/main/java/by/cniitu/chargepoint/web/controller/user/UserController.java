@@ -1,12 +1,14 @@
 package by.cniitu.chargepoint.web.controller.user;
 
 import by.cniitu.chargepoint.config.jwt.JwtProvider;
-import by.cniitu.chargepoint.model.Gender;
-import by.cniitu.chargepoint.model.User;
+import by.cniitu.chargepoint.entity.Gender;
+import by.cniitu.chargepoint.entity.User;
+import by.cniitu.chargepoint.model.Page;
 import by.cniitu.chargepoint.service.UserService;
 import by.cniitu.chargepoint.util.JwtsUtil;
 import by.cniitu.chargepoint.util.MailThreadExecutorUtil;
 import by.cniitu.chargepoint.util.UserUtil;
+import java.util.List;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -197,6 +199,40 @@ public class UserController {
         }
         MailThreadExecutorUtil.execute(() -> userService.confirmUserByEmail(user));
         return ResponseEntity.ok("{\"message\": \"Check your email please.\"}");
+    }
+
+    // TODO prepare all returned data before
+    /**
+     *
+     * @param page - number of needed page
+     * @return the needed page of users (page can have 100 or less users)
+     * example: if we have 345 users the 1st page would have 100 users, the 2nd one would have 100 users, ... and the 4th one - 45...
+     */
+    @GetMapping("/get/{page}/users")
+    public ResponseEntity<Object> getPageOfUsers(@PathVariable Integer page) throws Exception {
+        List<User> users = userService.findAll();
+        int size = users.size();
+        // System.out.println("size = " + size);
+        Integer pageAmount = size/Page.pageSize;
+        // System.out.println("Page.pageSize = " + Page.pageSize);
+        // System.out.println("pageAmount = " + pageAmount);
+        if(size % Page.pageSize != 0)
+            pageAmount++;
+        if(page > pageAmount)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"No such page\"}");
+
+        int fromIndex = (page - 1) * Page.pageSize;
+        int toIndex = fromIndex + Page.pageSize;
+        if(toIndex > size) {
+            toIndex = size;
+        }
+
+        // System.out.println("fromIndex = " + fromIndex);
+        // System.out.println("toIndex = " + toIndex);
+
+        Page<User> pageOfUsers = new Page<>(pageAmount, page, users.subList(fromIndex, toIndex));
+
+        return ResponseEntity.ok(pageOfUsers);
     }
 
 

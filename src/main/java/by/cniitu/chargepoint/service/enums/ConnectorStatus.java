@@ -13,6 +13,7 @@ public enum ConnectorStatus {
     static ConnectorStatus[] values = values();
 
     @Override
+    @JsonValue
     public String toString() {
         return super.toString().toLowerCase();
     }
@@ -35,11 +36,6 @@ public enum ConnectorStatus {
 
     public static int count(){
         return values.length;
-    }
-
-    @JsonValue // it is used while creating jsons
-    public String getMeters() {
-        return toString();
     }
 
 }

@@ -1,6 +1,6 @@
 package by.cniitu.chargepoint.repository;
 
-import by.cniitu.chargepoint.model.User;
+import by.cniitu.chargepoint.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

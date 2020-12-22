@@ -1,10 +1,10 @@
-package by.cniitu.chargepoint.model;
+package by.cniitu.chargepoint.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 
 @Entity
@@ -23,6 +23,7 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 

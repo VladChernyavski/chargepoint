@@ -1,7 +1,9 @@
 package by.cniitu.chargepoint.service;
 
 import by.cniitu.chargepoint.api.Smsc;
-import by.cniitu.chargepoint.model.User;
+import by.cniitu.chargepoint.entity.Gender;
+import by.cniitu.chargepoint.entity.Role;
+import by.cniitu.chargepoint.entity.User;
 import by.cniitu.chargepoint.repository.UserRepository;
 import by.cniitu.chargepoint.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -38,8 +41,8 @@ public class UserService {
     private Smsc smsc;
 
     @PostConstruct
-    void postConstruct(){
-        System.out.println("passwordEncoder.encode(\"Cfif98Cfif\") = " + passwordEncoder.encode("Cfif98Cfif"));
+    void postConstruct() {
+        // TODO prepare the pages of users here and than change them every time when userRepository is changed
     }
 
     public User findUserByEmail(String email) {
@@ -156,6 +159,10 @@ public class UserService {
             System.out.println(e.getMessage());
         }
         userRepository.save(user);
+    }
+
+    public List<User> findAll(){
+        return userRepository.findAll();
     }
 
     @Scheduled(fixedRate = 60000)
