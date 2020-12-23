@@ -1,6 +1,7 @@
 package by.cniitu.chargepoint.model.web.action;
 
 import by.cniitu.chargepoint.util.TimeUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,9 +10,13 @@ import lombok.NoArgsConstructor;
 public class ReserveAction extends UserAction{
 
     String totalTime;
+
+    @JsonIgnore
     Integer totalSeconds;
     String remainedTime;
     String currentTime = "0:00";        // example : "01:23"
+
+    @JsonIgnore
     Integer currentSeconds = 0;         // example : 83
     boolean shouldBeFinished = false;
 

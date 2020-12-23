@@ -1,6 +1,7 @@
 package by.cniitu.chargepoint.model.web.action;
 
 import by.cniitu.chargepoint.util.TimeUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,13 +9,29 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ChargeAction extends UserAction{
 
-    Double totalEnergy;                 // кВт⋅ч
-    Double remainedEnergy;              // кВт⋅ч
-    Double currentEnergy;               // Вт⋅ч (0.001 кВт⋅ч)
-    Integer currentWats = 0;            // Вт⋅ч (0.001 кВт⋅ч)
-    String currentTime = "0:00";        // example : "01:23"
-    Integer currentSeconds = 0;         // example : 83
-    Integer sameCount = 0;              // TODO add 1 when currentWats are the same and set to 0 otherwise
+    // кВт⋅ч
+    Double totalEnergy;
+
+    // кВт⋅ч
+    Double remainedEnergy;
+
+    // Вт⋅ч (0.001 кВт⋅ч)
+    Double currentEnergy;
+
+    @JsonIgnore
+    // Вт⋅ч (0.001 кВт⋅ч)
+    Integer currentWats = 0;
+
+    // example : "01:23"
+    String currentTime = "0:00";
+
+    @JsonIgnore
+    // example : 83
+    Integer currentSeconds = 0;
+
+    @JsonIgnore
+    // TODO add 1 when currentWats are the same and set to 0 otherwise
+    Integer sameCount = 0;
     boolean shouldBeFinished = false;
 
     public ChargeAction(Double totalEnergy){

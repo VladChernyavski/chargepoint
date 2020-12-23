@@ -1,5 +1,6 @@
 package by.cniitu.chargepoint.web.controller;
 
+import by.cniitu.chargepoint.entity.User;
 import by.cniitu.chargepoint.model.ChargePoint;
 import by.cniitu.chargepoint.model.request.*;
 import by.cniitu.chargepoint.model.web.action.ChargeAction;
@@ -9,6 +10,7 @@ import by.cniitu.chargepoint.model.web.map.Connector;
 import by.cniitu.chargepoint.model.web.map.MapPoint;
 import by.cniitu.chargepoint.service.ChargePointService;
 import by.cniitu.chargepoint.service.UserActionService;
+import by.cniitu.chargepoint.service.UserService;
 import by.cniitu.chargepoint.service.enums.ConnectorStatus;
 import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
 import by.cniitu.chargepoint.util.JsonUtil;
@@ -34,6 +36,9 @@ public class ChargePointController {
 
     @Autowired
     UserActionService userActionService;
+
+    @Autowired
+    UserService userService;
 
     @PostMapping("/reservenow")
     public ResponseEntity<Object> reserveNow(@PathVariable int id, @RequestBody ReserveNowRequest request) {
@@ -378,7 +383,8 @@ public class ChargePointController {
         if (status == ConnectorStatus.WORK) {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("{\"message\": \"please connect the connector and try again\", \"status\": \"plug\"}");
         } else if (status== ConnectorStatus.CONNECTED) {
-            UserActionService.userActionMap.put(userId, new UserActionTo(id, conId, new ChargeAction(energy)));
+            // TODO add transaction ID
+            UserActionService.userActionMap.put(userId, new UserActionTo(id, conId, new ChargeAction(energy), 0));
 
             // TODO save start of transaction to database end somehow finish transaction
             connector.setStatus(ConnectorStatus.BUSY);
@@ -398,6 +404,11 @@ public class ChargePointController {
                                         @PathVariable Integer userId, @RequestParam Integer totalSeconds) throws Exception {
 
         // TODO check the existence of the user using database
+        User user = userService.getOne(userId);
+        if(user == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown user id\", \"status\": \" not ok\"}");
+        }
+
         // TODO check the balance and save transactions even when the time was 0 (when the client had not enough money)
 
         Connector connector;
@@ -407,7 +418,8 @@ public class ChargePointController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
         }
         if (connector.getStatus() == ConnectorStatus.WORK) {
-            UserActionService.userActionMap.put(userId, new UserActionTo(id, conId, new ReserveAction(totalSeconds)));
+            // TODO add transaction ID
+            UserActionService.userActionMap.put(userId, new UserActionTo(id, conId, new ReserveAction(totalSeconds),  0));
 
             // TODO save start of transaction to database end somehow finish transaction
             connector.setStatus(ConnectorStatus.RESERVED);
@@ -415,10 +427,7 @@ public class ChargePointController {
             return ResponseEntity.ok("{\"message\": \"reservation is started\", \"status\": \"ok\"}");
         }
 
-        // TODO save start of transaction to database end somehow finish transaction
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"reservation process is now unavailable\"}");
     }
-
-    // TODO make an end-point that gives existing types of connectors (Type2, J1772, ...)
 
 }
