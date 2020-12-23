@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 
+import java.util.List;
 
 @Entity
 @Table(name = "charge_point")
@@ -51,7 +52,7 @@ public class ChargePointEntity {
     @Column(name = "longitude")
     private Double longitude;
 
-    @OneToMany(mappedBy = "charge_point")
-    private List<ConnectorEntity> standObjects;
+    @OneToMany(mappedBy = "chargePoint")
+    private List<ConnectorEntity> connectors;
 
 }

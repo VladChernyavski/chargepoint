@@ -1,17 +1,12 @@
 package by.cniitu.chargepoint.entity.connector;
 
 import by.cniitu.chargepoint.entity.ChargePointEntity;
-import by.cniitu.chargepoint.entity.Gender;
-import by.cniitu.chargepoint.entity.Role;
 import by.cniitu.chargepoint.entity.Tariff;
-import by.cniitu.chargepoint.model.ChargePoint;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "connector")
@@ -42,10 +37,8 @@ public class ConnectorEntity {
     @JoinColumn(name = "tariff_id")
     private Tariff tariff;
 
-    // TODO finish
-
     @ManyToOne
     @JoinColumn(name = "charge_point_id")
-    private ChargePointEntity charge_point_id;
+    private ChargePointEntity chargePoint;
 
 }
