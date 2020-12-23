@@ -1,5 +1,7 @@
-package by.cniitu.chargepoint.entity;
+package by.cniitu.chargepoint.entity.transaction;
 
+import by.cniitu.chargepoint.entity.User;
+import by.cniitu.chargepoint.entity.transaction.TransactionType;
 import lombok.Data;
 import lombok.ToString;
 

@@ -1,16 +1,18 @@
-package by.cniitu.chargepoint.entity;
+package by.cniitu.chargepoint.entity.transaction;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-// TODO make a table with charge points and use ConnectorType There.
-// TODO careful with making an enum
 @Entity
-@Table(name = "connector_type")
+@Table(name = "transaction_type")
 @Data
-public class ConnectorType {
+@AllArgsConstructor
+@NoArgsConstructor
+public class TransactionType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

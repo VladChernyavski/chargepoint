@@ -1,7 +1,7 @@
 package by.cniitu.chargepoint.service;
 
-import by.cniitu.chargepoint.entity.Transaction;
-import by.cniitu.chargepoint.entity.TransactionType;
+import by.cniitu.chargepoint.entity.transaction.Transaction;
+import by.cniitu.chargepoint.entity.transaction.TransactionType;
 import by.cniitu.chargepoint.entity.User;
 import by.cniitu.chargepoint.repository.TransactionRepository;
 import by.cniitu.chargepoint.repository.TransactionTypeRepository;
@@ -9,7 +9,6 @@ import by.cniitu.chargepoint.service.enums.UserActionEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 
 @Service

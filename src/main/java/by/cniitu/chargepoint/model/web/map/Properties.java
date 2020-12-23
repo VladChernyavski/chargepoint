@@ -18,6 +18,8 @@ public class Properties {
 
     private String tittle;
     private String address;
+
+    // TODO discuss the necessity
     private String worktime;
 
     public Properties(Properties properties){

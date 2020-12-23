@@ -403,13 +403,14 @@ public class ChargePointController {
     public ResponseEntity<Object> start(@PathVariable Integer id, @PathVariable Integer conId,
                                         @PathVariable Integer userId, @RequestParam Integer totalSeconds) throws Exception {
 
-        // TODO check the existence of the user using database
-        User user = userService.getOne(userId);
+        // check the existence of the user using database
+        User user = userService.findOneById(userId);
         if(user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown user id\", \"status\": \" not ok\"}");
         }
 
         // TODO check the balance and save transactions even when the time was 0 (when the client had not enough money)
+
 
         Connector connector;
         try {

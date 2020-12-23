@@ -138,8 +138,8 @@ public class UserService {
         return user;
     }
 
-    public User getOne(Integer id){
-        return userRepository.getOne(id);
+    public User findOneById(Integer id){
+        return userRepository.findOneById(id);
     }
 
     public User changeMoney(User user, Double amount){

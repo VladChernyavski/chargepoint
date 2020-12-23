@@ -36,7 +36,7 @@ public class UserController {
     @GetMapping("/activate/{code}")
     public ResponseEntity<String> activate(@PathVariable String code) {
         User confirmedEmailUser = UserUtil.getUserByParseCode(code);
-        if (confirmedEmailUser == null) {
+        if (confirmedEmailUser == null || confirmedEmailUser.getId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Your link is invalid\"}");
         }
         User user = userService.findUserByEmail(confirmedEmailUser.getEmail());
@@ -65,7 +65,7 @@ public class UserController {
     public ResponseEntity<String> activate(@RequestBody RegisterCodeRequest request){
         int code = request.getCode();
         User newUser = UserUtil.noConfirmedUsers.get(code);
-        if(newUser == null){
+        if(newUser == null || newUser.getId() == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Your code is invalid\"}");
         }
         userService.create(newUser);
@@ -156,7 +156,7 @@ public class UserController {
 
     @GetMapping("/money/get/{userId}")
     public ResponseEntity<Object> getMoney(@PathVariable Integer userId) {
-        User user = userService.getOne(userId);
+        User user = userService.findOneById(userId);
         if(user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"No such user id\"}");
         }
@@ -166,7 +166,7 @@ public class UserController {
 
     @GetMapping("/money/change/{userId}/{amount}")
     public ResponseEntity<Object> changeMoney(@PathVariable Integer userId, @PathVariable Double amount) {
-        User user = userService.getOne(userId);
+        User user = userService.findOneById(userId);
         if(user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"No such user id\"}");
         }

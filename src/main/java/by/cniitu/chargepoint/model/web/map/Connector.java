@@ -14,8 +14,14 @@ public class Connector {
 
     private Integer number;
     private ConnectorStatus status;
+
+    // TODO create an enum from the database table if it is possible
+    // TODO think about it
+    // TODO ConnectorType
     private String type;
     private String power;
+
+    // charge and reserve
     private Tariffs tariffs;
 
 }
