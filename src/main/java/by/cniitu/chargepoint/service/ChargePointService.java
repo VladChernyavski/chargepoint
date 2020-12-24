@@ -1,8 +1,9 @@
 package by.cniitu.chargepoint.service;
 
-import by.cniitu.chargepoint.model.web.map.*;
-import by.cniitu.chargepoint.model.web.map.Properties;
-import by.cniitu.chargepoint.service.enums.ConnectorStatus;
+import by.cniitu.chargepoint.entity.ChargePointEntity;
+import by.cniitu.chargepoint.repository.ChargePointRepository;
+import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -10,27 +11,22 @@ import java.util.*;
 @Service
 public class ChargePointService {
 
-    // all charge points for map
-    // TODO use real values after all
-    // TODO save changes in mongoDB
-    public static Map<Integer, MapPoint> chargePointsMap = new HashMap<>();
+    @Autowired
+    ServerWebSocket serverWebSocket;
 
-    static{
+    @Autowired
+    ChargePointRepository chargePointRepository;
 
-
-
+    public void broadcastUpdate(Set<Integer> updateIds){
+        serverWebSocket.broadcastUpdate(updateIds);
     }
 
-    public Connector getConnector(Integer id, Integer conId) throws Exception{
-        MapPoint mapPoint = chargePointsMap.get(id);
-        if(mapPoint == null){
-           throw new Exception("unknown id");
-        }
-        Connector connector = mapPoint.getConnectors().get(conId);
-        if(connector == null){
-            throw new Exception("unknown connector id");
-        }
-        return connector;
+    public void broadcastUpdate(Integer updateId){
+        serverWebSocket.broadcastUpdate(updateId);
+    }
+
+    public List<ChargePointEntity> findAll(){
+        return chargePointRepository.findAll();
     }
 
 }

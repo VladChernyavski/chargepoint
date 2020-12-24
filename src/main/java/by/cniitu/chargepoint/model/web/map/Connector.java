@@ -1,5 +1,7 @@
 package by.cniitu.chargepoint.model.web.map;
 
+import by.cniitu.chargepoint.entity.Tariff;
+import by.cniitu.chargepoint.entity.connector.ConnectorEntity;
 import by.cniitu.chargepoint.service.enums.ConnectorStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +24,14 @@ public class Connector {
     private String power;
 
     // charge and reserve
-    private Tariffs tariffs;
+    private Tariff tariff;
+
+    public Connector(ConnectorEntity connectorEntity){
+        this.number = connectorEntity.getNumber();
+        this.status = connectorEntity.getStatus().getName();
+        this.type = connectorEntity.getType().getName();
+        this.power = connectorEntity.getPower().toString();
+        this.tariff = connectorEntity.getTariff();
+    }
 
 }

@@ -1,5 +1,6 @@
 package by.cniitu.chargepoint.model.web.map;
 
+import by.cniitu.chargepoint.entity.ChargePointEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,6 +49,10 @@ public class MapPoint {
     private Properties properties;
     private Map<Integer, Connector> connectors;
     private Geometry geometry;
+
+    public MapPoint(ChargePointEntity chargePointEntity){
+
+    }
 
 
 }

@@ -13,17 +13,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @EnableScheduling
 public class UserActionService {
 
     @Autowired
-    ServerWebSocket serverWebSocket;
+    ChargePointService chargePointService;
+
+    @Autowired
+    ConnectorService connectorService;
 
     // if type of the connector is busy and the charge process is finished -> it was finished by server (user), not by chargePoint
     // if type of the connector is reserved and the reservation process is finished -> it was finished by server (user), not by chargePoint
@@ -55,7 +55,12 @@ public class UserActionService {
                 continue;
 
             Integer chargePointId = userActionTo.getChargePointId();
-            Connector connector = ChargePointService.chargePointsMap.get(chargePointId).getConnectors().get(userActionTo.getConnectorId());
+            Connector connector = null;
+            try {
+                connector = connectorService.getConnector(chargePointId, userActionTo.getConnectorId());
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
             ConnectorStatus conStatus = connector.getStatus();
             UserActionEnum userActionEnum = userActionTo.getType();
             boolean rightStatus = conStatus == actionNameToConnectorStatus.get(userActionEnum);
@@ -85,8 +90,9 @@ public class UserActionService {
                 // if the charge is finished and the connector status is busy set connector status to connected
                 // if the reservation and connector status is reserved is finished set connector status to work
                 if(rightStatus){
+                    // TODO save changes to database
                     connector.setStatus(actionNameToNextConnectorStatusAfterFinish.get(userActionEnum));
-                    serverWebSocket.broadcastUpdate(chargePointId);
+                    chargePointService.broadcastUpdate(chargePointId);
                 }
 
                 // TODO write the finish of transaction to database

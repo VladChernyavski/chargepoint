@@ -4,11 +4,14 @@ import by.cniitu.chargepoint.config.jwt.JwtProvider;
 import by.cniitu.chargepoint.entity.Gender;
 import by.cniitu.chargepoint.entity.User;
 import by.cniitu.chargepoint.model.Page;
+import by.cniitu.chargepoint.model.UserTo;
 import by.cniitu.chargepoint.service.UserService;
 import by.cniitu.chargepoint.util.JwtsUtil;
 import by.cniitu.chargepoint.util.MailThreadExecutorUtil;
 import by.cniitu.chargepoint.util.UserUtil;
-import java.util.List;
+
+import java.util.*;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,9 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 @CrossOrigin("*")
 @RestController
@@ -230,7 +230,12 @@ public class UserController {
         // System.out.println("fromIndex = " + fromIndex);
         // System.out.println("toIndex = " + toIndex);
 
-        Page<User> pageOfUsers = new Page<>(pageAmount, page, users.subList(fromIndex, toIndex));
+        List<UserTo> userToList = new LinkedList<>();
+        for(User user : users.subList(fromIndex, toIndex)){
+            userToList.add(new UserTo(user));
+        }
+
+        Page<UserTo> pageOfUsers = new Page<>(pageAmount, page, userToList);
 
         return ResponseEntity.ok(pageOfUsers);
     }

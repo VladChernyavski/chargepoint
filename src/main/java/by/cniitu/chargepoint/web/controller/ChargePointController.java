@@ -40,6 +40,7 @@ public class ChargePointController {
     @Autowired
     UserService userService;
 
+    // TODO something with this
     @PostMapping("/reservenow")
     public ResponseEntity<Object> reserveNow(@PathVariable int id, @RequestBody ReserveNowRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -53,6 +54,7 @@ public class ChargePointController {
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
+    // TODO something with this
     @PostMapping("/cancelreservation")
     public ResponseEntity<Object> cancelReservation(@PathVariable int id, @RequestBody CancelReservationRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -122,6 +124,7 @@ public class ChargePointController {
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
+    // TODO something with this
     @PostMapping("/datatransfer")
     public ResponseEntity<Object> dataTransfer(@PathVariable int id, @RequestBody DataTransferRequest request) {
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -191,6 +194,7 @@ public class ChargePointController {
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
+    // TODO something with this
     @PostMapping("/remotestarttransaction")
     public ResponseEntity<Object> remoteStartTransaction(@PathVariable int id, @RequestBody RemoteStartTransactionRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -204,6 +208,7 @@ public class ChargePointController {
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
+    // TODO something with this
     @PostMapping("/remotestoptransaction")
     public ResponseEntity<Object> remoteStopTransaction(@PathVariable int id, @RequestBody RemoteStopTransactionRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -217,6 +222,7 @@ public class ChargePointController {
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
+    // TODO something with this
     @PostMapping("/reset")
     public ResponseEntity<Object> reset(@PathVariable int id, @RequestBody ResetRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -272,6 +278,7 @@ public class ChargePointController {
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
+    // TODO something with this
     @PostMapping("/unlockconnector")
     public ResponseEntity<Object> unlockConnector(@PathVariable int id, @RequestBody UnlockConnectorRequest request){
         WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
@@ -299,37 +306,6 @@ public class ChargePointController {
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
-    // TODO get real tariffs
-    @GetMapping("/tariffs")
-    public ResponseEntity<Object> getTariffs(@PathVariable int id){
-
-        ResponseEntity<Object> result = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"id is not found\"}");
-
-        for(MapPoint mapPoint : new LinkedList<>(ChargePointService.chargePointsMap.values())){
-            if(mapPoint.getId() == id){
-
-                double tariff;
-
-                if(id % 2 == 0){
-                    tariff = 2.28;
-                } else {
-                    tariff = 36.6;
-                }
-
-                List<Double> tariffs = new LinkedList<>();
-
-                for(int i = 0; i < mapPoint.getConnectors().size(); i++){
-                    tariffs.add(tariff);
-                }
-
-                result = ResponseEntity.ok(tariffs);
-
-            }
-        }
-
-        return result;
-    }
-
     private Object[] getRequestObject(Object... objects) {
         Object[] requestObject = new Object[objects.length];
         System.arraycopy(objects, 0, requestObject, 0, requestObject.length);
@@ -342,10 +318,6 @@ public class ChargePointController {
     public ResponseEntity<Object> status(@PathVariable Integer id, @PathVariable Integer conId,
                                         @PathVariable String status) {
 
-        // TODO redu
-        //if(!ChargePointService.conStatuses.contains(status))
-        //    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown status\"}");
-
         Connector connector;
         try {
             connector = chargePointService.getConnector(id, conId);
@@ -353,7 +325,6 @@ public class ChargePointController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
         }
 
-        // TODO check
         connector.setStatus(ConnectorStatus.get(status));
         serverWebSocket.broadcastUpdate(id);
         return ResponseEntity.ok("{\"message\": \"status is changed\"}");

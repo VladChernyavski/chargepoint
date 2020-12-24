@@ -1,22 +1,29 @@
 package by.cniitu.chargepoint.service.mock;
 
+import by.cniitu.chargepoint.entity.ChargePointEntity;
 import by.cniitu.chargepoint.model.web.map.Connector;
 import by.cniitu.chargepoint.model.web.map.MapPoint;
 import by.cniitu.chargepoint.service.ChargePointService;
 import by.cniitu.chargepoint.service.enums.ConnectorStatus;
-import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @AllArgsConstructor
-public class SendGeneralInformation extends Thread {
+@Service
+@EnableScheduling
+public class SendGeneralInformation{
 
-    ServerWebSocket serverWebSocket;
-
-    static int waitTime = 5000;
+    @Autowired
+    ChargePointService chargePointService;
 
     static Map<ConnectorStatus, ConnectorStatus> nextStatus = new HashMap<>();
+
+    static Random random = new Random();
 
     static{
         nextStatus.put(ConnectorStatus.get(ConnectorStatus.count() - 1), ConnectorStatus.get(0));
@@ -39,43 +46,33 @@ public class SendGeneralInformation extends Thread {
         normalChargePointIds.add(12);
     }
 
-    @Override
+    @Scheduled(fixedRate = 5000)
     public void run() {
 
-        // even coordinates can be updated
+        Set<Integer> updatesIds = new HashSet<>();
 
-        Random random = new Random();
+        // TODO update directly database using chargePointService
 
+        List<ChargePointEntity> chargePointEntities = chargePointService.findAll();
 
-
-        while (true){
-
-                try {
-
-                    Set<Integer> updatesIds = new HashSet<>();
-
-                    // update something
-                    for(Map.Entry<Integer, MapPoint> entry : ChargePointService.chargePointsMap.entrySet()){
-                        int randomNum = random.nextInt(8); // 0 <= x < 8
-                        Integer id = entry.getKey();
-                        if (randomNum == 0 && !normalChargePointIds.contains(id)) {
-                            Map<Integer, Connector> connectors = entry.getValue().getConnectors();
-                            int connectorNumber = random.nextInt(connectors.size()) + 1; // 1 or 2
-                            Connector connector = connectors.get(connectorNumber);
-                            connector.setStatus(nextStatus.get(connector.getStatus()));
-                            updatesIds.add(id);
-                        }
-                    }
-
-                    Thread.sleep(waitTime);
-                    serverWebSocket.broadcastUpdate(updatesIds);
+        // update something
+        for(ChargePointEntity entity : chargePointEntities) {
+            int randomNum = random.nextInt(8); // 0 <= x < 8
+            Integer id = entity.getId();
+            if (randomNum == 0 && !normalChargePointIds.contains(id)) {
 
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
 
+                Map<Integer, Connector> connectors = entry.getValue().getConnectors();
+                int connectorNumber = random.nextInt(connectors.size()) + 1; // 1 or 2
+                Connector connector = connectors.get(connectorNumber);
+                connector.setStatus(nextStatus.get(connector.getStatus()));
+                updatesIds.add(id);
+            }
         }
+
+        chargePointService.broadcastUpdate(updatesIds);
+
     }
 
 }
