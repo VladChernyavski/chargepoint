@@ -111,4 +111,6 @@ public class ServerWebSocket extends WebSocketServer {
 
     }
 
+    // TODO some methods to update the map of points
+
 }

@@ -52,7 +52,7 @@ public class ChargePointEntity {
     @Column(name = "longitude")
     private Double longitude;
 
-    @OneToMany(mappedBy = "chargePoint")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "chargePoint", cascade = CascadeType.ALL)
     private List<ConnectorEntity> connectors;
 
 }

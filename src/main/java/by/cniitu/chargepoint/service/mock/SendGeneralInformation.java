@@ -1,25 +1,31 @@
 package by.cniitu.chargepoint.service.mock;
 
 import by.cniitu.chargepoint.entity.ChargePointEntity;
-import by.cniitu.chargepoint.model.web.map.Connector;
-import by.cniitu.chargepoint.model.web.map.MapPoint;
+import by.cniitu.chargepoint.entity.connector.ConnectorEntity;
+import by.cniitu.chargepoint.entity.connector.ConnectorStatusEntity;
 import by.cniitu.chargepoint.service.ChargePointService;
+import by.cniitu.chargepoint.service.ConnectorService;
+import by.cniitu.chargepoint.service.ConnectorStatusService;
 import by.cniitu.chargepoint.service.enums.ConnectorStatus;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@AllArgsConstructor
 @Service
 @EnableScheduling
 public class SendGeneralInformation{
 
-    @Autowired
-    ChargePointService chargePointService;
+    final ChargePointService chargePointService;
+    final ConnectorStatusService connectorStatusService;
+    final ConnectorService connectorService;
+
+    public SendGeneralInformation(ChargePointService chargePointService, ConnectorStatusService connectorStatusService, ConnectorService connectorService) {
+        this.chargePointService = chargePointService;
+        this.connectorStatusService = connectorStatusService;
+        this.connectorService = connectorService;
+    }
 
     static Map<ConnectorStatus, ConnectorStatus> nextStatus = new HashMap<>();
 
@@ -61,12 +67,13 @@ public class SendGeneralInformation{
             Integer id = entity.getId();
             if (randomNum == 0 && !normalChargePointIds.contains(id)) {
 
-
-
-                Map<Integer, Connector> connectors = entry.getValue().getConnectors();
-                int connectorNumber = random.nextInt(connectors.size()) + 1; // 1 or 2
-                Connector connector = connectors.get(connectorNumber);
-                connector.setStatus(nextStatus.get(connector.getStatus()));
+                List<ConnectorEntity> connectors = entity.getConnectors();
+                int connectorNumber = random.nextInt(connectors.size()); // 0 or 1
+                ConnectorEntity connectorEntity = connectors.get(connectorNumber);
+                ConnectorStatus nextConnectorStatus = nextStatus.get(connectorEntity.getStatus().getName());
+                ConnectorStatusEntity connectorStatusEntity = connectorStatusService.findByName(nextConnectorStatus);
+                connectorEntity.setStatus(connectorStatusEntity);
+                connectorService.save(connectorEntity);
                 updatesIds.add(id);
             }
         }
