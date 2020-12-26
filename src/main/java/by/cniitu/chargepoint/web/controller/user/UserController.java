@@ -162,7 +162,7 @@ public class UserController {
         if(user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"No such user id\"}");
         }
-        return ResponseEntity.ok("{\"message\": " + user.getMoney() +"}");
+        return ResponseEntity.ok("{\"message\": " + (double)(int)(user.getMoney()*100)/100 +"}");
 
     }
 

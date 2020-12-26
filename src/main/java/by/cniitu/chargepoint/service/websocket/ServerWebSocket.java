@@ -29,7 +29,6 @@ public class ServerWebSocket extends WebSocketServer {
 
     // all charge points
     // it must be in this service
-    // TODO use real values after all
     // TODO save changes in mongoDB
     Map<Integer, MapPoint> chargePointsMap = new HashMap<>();
 
@@ -39,6 +38,9 @@ public class ServerWebSocket extends WebSocketServer {
     }
 
     static public Map<Integer, Set<WebSocket>> userWebSockets = new HashMap<>();
+
+    // TODO make filters. Users can have different filters.
+    // {"statusfree":true,"statusempty":false,"typefast":true,"typeslow":false,"Type2":true,"J1772":true}
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
