@@ -5,6 +5,7 @@ import org.java_websocket.WebSocket;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+// TODO use it or delete
 public class ChargePoint {
 
     public static final Map<Integer, WebSocket> websocketByChargePointId = new ConcurrentHashMap<>();

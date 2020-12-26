@@ -6,7 +6,7 @@ import by.cniitu.chargepoint.entity.User;
 import by.cniitu.chargepoint.model.Page;
 import by.cniitu.chargepoint.model.UserTo;
 import by.cniitu.chargepoint.service.UserService;
-import by.cniitu.chargepoint.util.JwtsUtil;
+import by.cniitu.chargepoint.util.JwtUtil;
 import by.cniitu.chargepoint.util.MailThreadExecutorUtil;
 import by.cniitu.chargepoint.util.UserUtil;
 
@@ -16,7 +16,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +26,13 @@ import java.time.LocalDate;
 @RestController
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final JwtProvider jwtProvider;
 
-    @Autowired
-    private JwtProvider jwtProvider;
+    public UserController(UserService userService, JwtProvider jwtProvider) {
+        this.userService = userService;
+        this.jwtProvider = jwtProvider;
+    }
 
     @GetMapping("/activate/{code}")
     public ResponseEntity<String> activate(@PathVariable String code) {
@@ -74,7 +75,7 @@ public class UserController {
         return ResponseEntity.ok("{\"message\": \"Your phone is confirmed\"}");
     }
 
-    @PostMapping("/authbyemail")
+    @PostMapping("/authByEmail")
     public ResponseEntity<Object> authByEmail(@RequestBody AuthRequest request ){
         User user = getUserByClaims(request.getToken(), "authByEmail");
         if (Objects.isNull(user)){
@@ -87,7 +88,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/authbyphone")
+    @PostMapping("/authByPhone")
     public ResponseEntity<Object> authByPhoneNumber(@RequestBody AuthRequest request ){
         User user = getUserByClaims(request.getToken(), "authByPhone");
 
@@ -102,7 +103,7 @@ public class UserController {
     }
 
     private User getUserByClaims(String token, String method) {
-        Claims claims = JwtsUtil.getClaims(token);
+        Claims claims = JwtUtil.getClaims(token);
         if (Objects.isNull(claims)) {
             return null;
         }
@@ -139,8 +140,8 @@ public class UserController {
         return user;
     }
 
-    //TODO DELETE
-    @GetMapping("/authtoken")
+    // TODO delete
+    @GetMapping("/authToken")
     public String auth(@RequestParam("l") String login,
                        @RequestParam("p") String password
     ) {
@@ -150,7 +151,8 @@ public class UserController {
         }};
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, "chargepoint".getBytes())
+                // TODO keep secret key only in one place
+                .signWith(SignatureAlgorithm.HS512, "chargePoint".getBytes())
                 .compact();
     }
 
@@ -177,7 +179,7 @@ public class UserController {
 
     // TODO make it with tokens
     // works only using email
-    @PostMapping("/changepassword/{email}")
+    @PostMapping("/changePassword/{email}")
     public ResponseEntity<Object> changePassword(@PathVariable String email) {
         User user = userService.findUserByEmail(email);
         if (Objects.isNull(user)) {
@@ -212,31 +214,21 @@ public class UserController {
     public ResponseEntity<Object> getPageOfUsers(@PathVariable Integer page) throws Exception {
         List<User> users = userService.findAll();
         int size = users.size();
-        // System.out.println("size = " + size);
         Integer pageAmount = size/Page.pageSize;
-        // System.out.println("Page.pageSize = " + Page.pageSize);
-        // System.out.println("pageAmount = " + pageAmount);
         if(size % Page.pageSize != 0)
             pageAmount++;
         if(page > pageAmount)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"No such page\"}");
-
         int fromIndex = (page - 1) * Page.pageSize;
         int toIndex = fromIndex + Page.pageSize;
         if(toIndex > size) {
             toIndex = size;
         }
-
-        // System.out.println("fromIndex = " + fromIndex);
-        // System.out.println("toIndex = " + toIndex);
-
         List<UserTo> userToList = new LinkedList<>();
         for(User user : users.subList(fromIndex, toIndex)){
             userToList.add(new UserTo(user));
         }
-
         Page<UserTo> pageOfUsers = new Page<>(pageAmount, page, userToList);
-
         return ResponseEntity.ok(pageOfUsers);
     }
 

@@ -1,6 +1,8 @@
 package by.cniitu.chargepoint.entity;
 
+import by.cniitu.chargepoint.model.TariffTo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Data;
 import lombok.ToString;
 
@@ -22,5 +24,11 @@ public class Tariff {
 
     @Column(name = "reserve")
     private Double reserve;
+
+    // It is used
+    @JsonValue
+    public TariffTo toJson(){
+        return new TariffTo(this);
+    }
 
 }

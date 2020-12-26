@@ -1,12 +1,9 @@
 package by.cniitu.chargepoint.service;
 
 import by.cniitu.chargepoint.api.Smsc;
-import by.cniitu.chargepoint.entity.Gender;
-import by.cniitu.chargepoint.entity.Role;
 import by.cniitu.chargepoint.entity.User;
 import by.cniitu.chargepoint.repository.UserRepository;
 import by.cniitu.chargepoint.util.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -15,9 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-
 import javax.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -25,20 +20,19 @@ import java.util.*;
 @EnableScheduling
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final Environment environment;
+    private final MailService mailService;
+    private final Smsc smsc;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private Environment environment;
-
-    @Autowired
-    private MailService mailService;
-
-    @Autowired
-    private Smsc smsc;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, Environment environment, MailService mailService, Smsc smsc) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.environment = environment;
+        this.mailService = mailService;
+        this.smsc = smsc;
+    }
 
     @PostConstruct
     void postConstruct() {
@@ -75,10 +69,12 @@ public class UserService {
         return null;
     }
 
-    public User create(User user) {
-        return userRepository.save(prepareAndSave(user));
+    // create new user and set the password
+    public void create(User user) {
+        userRepository.save(prepareAndSave(user));
     }
 
+    // save user without codding the password
     public User save(User user) {
         return userRepository.save(user);
     }
@@ -123,7 +119,7 @@ public class UserService {
         UserUtil.noConfirmedUsers.put(code, user);
         UserUtil.map.put(LocalDateTime.now(), code);
 
-        smsc.send_sms(user.getPhoneNumber(), "Confirmation code: " + code, 0, "", "", 0, "CHARGEPOINT", "");
+        smsc.send_sms(user.getPhoneNumber(), "Confirmation code: " + code, 0, "", "", 0, "CNIITU charges", "");
     }
 
     private User prepareAndSave(User user) {

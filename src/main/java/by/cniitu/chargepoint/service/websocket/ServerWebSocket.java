@@ -2,13 +2,11 @@ package by.cniitu.chargepoint.service.websocket;
 
 import by.cniitu.chargepoint.model.web.map.MapPoint;
 import by.cniitu.chargepoint.model.web.map.WebInformation;
-import by.cniitu.chargepoint.service.ChargePointService;
 import by.cniitu.chargepoint.util.JsonUtil;
 import by.cniitu.chargepoint.util.MapUtil;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +18,6 @@ import java.util.stream.Collectors;
 @Service
 public class ServerWebSocket extends WebSocketServer {
 
-    @Autowired
-    ChargePointService chargePointService;
-
     public ServerWebSocket(@Value("${websocket.web.port}") int port) {
         super(new InetSocketAddress(port));
     }
@@ -32,18 +27,18 @@ public class ServerWebSocket extends WebSocketServer {
         this.start();
     }
 
+    // all charge points
+    // it must be in this service
+    // TODO use real values after all
+    // TODO save changes in mongoDB
+    Map<Integer, MapPoint> chargePointsMap = new HashMap<>();
+
     @Override
     public void onStart() {
         System.out.println("ServerWebSocket onStart");
     }
 
     static public Map<Integer, Set<WebSocket>> userWebSockets = new HashMap<>();
-
-    // all charge points
-    // it must be in this service
-    // TODO use real values after all
-    // TODO save changes in mongoDB
-    Map<Integer, MapPoint> chargePointsMap = new HashMap<>();
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
@@ -70,7 +65,7 @@ public class ServerWebSocket extends WebSocketServer {
 
         int userId = -1;
 
-        if(s.equals("givedata")){
+        if(s.equals("giveData")){
             broadcast(JsonUtil.getJsonString(new WebInformation("data",
                     MapUtil.MapPointListToMapPointToList(new LinkedList<>(chargePointsMap.values())))));
         } else if(s.startsWith("{\"id\":\"")){
@@ -111,6 +106,13 @@ public class ServerWebSocket extends WebSocketServer {
 
     }
 
-    // TODO some methods to update the map of points
+    public void put(MapPoint mapPoint){
+        chargePointsMap.put(mapPoint.getId(), mapPoint);
+    }
+
+    // TODO use it
+    public void remove(Integer chargePointId){
+        chargePointsMap.remove(chargePointId);
+    }
 
 }

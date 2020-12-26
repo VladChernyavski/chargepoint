@@ -11,12 +11,13 @@ import java.net.URLEncoder;
 @Component
 public class Smsc {
 
+    // TODO move SMSC_LOGIN and SMSC_PASSWORD to application.properties
     String SMSC_LOGIN    = "alexxxxxx2019@gmail.com";     // логин клиента
-    String SMSC_PASSWORD = "Cfif98Cfif";  // пароль
-    boolean SMSC_HTTPS   = false;         // использовать HTTPS протокол
-    String SMSC_CHARSET  = "utf-8";       // кодировка сообщения: koi8-r, windows-1251 или utf-8 (по умолчанию)
-    boolean SMSC_DEBUG   = false;         // флаг отладки
-    boolean SMSC_POST    = false;         // Использовать метод POST
+    String SMSC_PASSWORD = "Cfif98Cfif";                  // пароль
+    boolean SMSC_HTTPS   = false;                         // использовать HTTPS протокол
+    String SMSC_CHARSET  = "utf-8";                       // кодировка сообщения: koi8-r, windows-1251 или utf-8 (по умолчанию)
+    boolean SMSC_DEBUG   = false;                         // флаг отладки
+    boolean SMSC_POST    = false;                         // Использовать метод POST
 
     /**
      * constructors
@@ -57,6 +58,7 @@ public class Smsc {
      * или массив (<id>, -<код ошибки>) в случае ошибки
      */
 
+    // TODO work with return values
     public String[] send_sms(String phones, String message, int translit, String time, String id, int format, String sender, String query)
     {
         String[] formats = {"", "flash=1", "push=1", "hlr=1", "bin=1", "bin=2", "ping=1", "mms=1", "mail=1", "call=1", "viber=1", "soc=1"};
@@ -66,12 +68,12 @@ public class Smsc {
             m = _smsc_send_cmd("send", "cost=3&phones=" + URLEncoder.encode(phones, SMSC_CHARSET)
                     + "&mes=" + URLEncoder.encode(message, SMSC_CHARSET)
                     + "&translit=" + translit + "&id=" + id + (format > 0 ? "&" + formats[format] : "")
-                    + (sender == "" ? "" : "&sender=" + URLEncoder.encode(sender, SMSC_CHARSET))
-                    + (time == "" ? "" : "&time=" + URLEncoder.encode(time, SMSC_CHARSET) )
-                    + (query == "" ? "" : "&" + query));
+                    + (sender.equals("") ? "" : "&sender=" + URLEncoder.encode(sender, SMSC_CHARSET))
+                    + (time.equals("") ? "" : "&time=" + URLEncoder.encode(time, SMSC_CHARSET) )
+                    + (query.equals("") ? "" : "&" + query));
         }
         catch (UnsupportedEncodingException e) {
-
+            e.printStackTrace();
         }
 
         if (m.length > 1) {
@@ -90,7 +92,7 @@ public class Smsc {
         }
 
         return m;
-    };
+    }
 
     /**
      * Получение стоимости SMS
@@ -104,6 +106,7 @@ public class Smsc {
      * @return array(<стоимость>, <количество sms>) либо (0, -<код ошибки>) в случае ошибки
      */
 
+    // TODO use it somewhere
     public String[] get_sms_cost(String phones, String message, int translit, int format, String sender, String query)
     {
         String[] formats = {"", "flash=1", "push=1", "hlr=1", "bin=1", "bin=2", "ping=1", "mms=1", "mail=1", "call=1", "viber=1", "soc=1"};
@@ -113,11 +116,11 @@ public class Smsc {
             m = _smsc_send_cmd("send", "cost=1&phones=" + URLEncoder.encode(phones, SMSC_CHARSET)
                     + "&mes=" + URLEncoder.encode(message, SMSC_CHARSET)
                     + "&translit=" + translit + (format > 0 ? "&" + formats[format] : "")
-                    + (sender == "" ? "" : "&sender=" + URLEncoder.encode(sender, SMSC_CHARSET))
-                    + (query == "" ? "" : "&" + query));
+                    + (sender.equals("") ? "" : "&sender=" + URLEncoder.encode(sender, SMSC_CHARSET))
+                    + (query.equals("") ? "" : "&" + query));
         }
         catch (UnsupportedEncodingException e) {
-
+            e.printStackTrace();
         }
         // (cost, cnt) или (0, -error)
 
@@ -139,7 +142,7 @@ public class Smsc {
     /**
      * Проверка статуса отправленного SMS или HLR-запроса
      *
-     * @param id - ID cообщения
+     * @param id - ID сообщения
      * @param phone - номер телефона
      * @param all - дополнительно возвращаются элементы в конце массива:
      *  (<время отправки>, <номер телефона>, <стоимость>, <sender id>, <название статуса>, <текст сообщения>)
@@ -150,7 +153,7 @@ public class Smsc {
      * <код IMSI SIM-карты>, <номер сервис-центра>)
      * либо array(0, -<код ошибки>) в случае ошибки
      */
-
+    // TODO use it somewhere
     public String[] get_status(int id, String phone, int all)
     {
         String[] m = {};
@@ -161,16 +164,16 @@ public class Smsc {
 
             if (m.length > 1) {
                 if (SMSC_DEBUG) {
-                    if (m[1] != "" && Integer.parseInt(m[1]) >= 0) {
-                        java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(Integer.parseInt(m[1]));
+                    if (!m[1].equals("") && Integer.parseInt(m[1]) >= 0) {
+                        // java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(Integer.parseInt(m[1]));
                         System.out.println("Статус SMS = " + m[0]);
                     }
                     else
                         System.out.println("Ошибка №" + Math.abs(Integer.parseInt(m[1])));
                 }
 
-                if (all == 1 && m.length > 9 && (m.length < 14 || m[14] != "HLR")) {
-                    tmp = _implode(m, ",");
+                if (all == 1 && m.length > 9 && (m.length < 14 || !m[14].equals("HLR"))) {
+                    tmp = _implode(m);
                     m = tmp.split(",", 9);
                 }
             }
@@ -179,20 +182,21 @@ public class Smsc {
 
         }
         catch (UnsupportedEncodingException e) {
-
+            e.printStackTrace();
         }
 
         return m;
     }
 
     /**
-     * Получениe баланса
+     * Получение баланса
      *
      * @return String баланс или пустую строку в случае ошибки
      */
 
+    // TODO use it somewhere, for example: show on the front to admins
     public String get_balance() {
-        String[] m = {};
+        String[] m;
 
         m = _smsc_send_cmd("balance", ""); // (balance) или (0, -error)
 
@@ -234,10 +238,10 @@ public class Smsc {
                 }
                 ret = _smsc_read_url(url);
             }
-            while (ret == "" && i < 5);
+            while (ret.equals("") && i < 5);
         }
         catch (UnsupportedEncodingException e) {
-
+            e.printStackTrace();
         }
 
         return ret.split(",");
@@ -245,12 +249,13 @@ public class Smsc {
 
     /**
      * Чтение URL
-     * @param url - ID cообщения
+     * @param url - ID сообщение
      * @return line - ответ сервера
      */
     private String _smsc_read_url(String url) {
 
-        String line = "", real_url = url;
+        StringBuilder line = new StringBuilder();
+        String real_url = url;
         String[] param = {};
         boolean is_post = (SMSC_POST || url.length() > 2000);
 
@@ -281,7 +286,7 @@ public class Smsc {
 
             int ch;
             while ((ch = reader.read()) != -1) {
-                line += (char)ch;
+                line.append((char) ch);
             }
 
             reader.close();
@@ -290,22 +295,22 @@ public class Smsc {
 
         }
         catch (IOException e) {
-
+            e.printStackTrace();
         }
 
-        return line;
+        return line.toString();
     }
 
-    private static String _implode(String[] ary, String delim) {
-        String out = "";
+    private static String _implode(String[] ary) {
+        StringBuilder out = new StringBuilder();
 
         for (int i = 0; i < ary.length; i++) {
             if (i != 0)
-                out += delim;
-            out += ary[i];
+                out.append(",");
+            out.append(ary[i]);
         }
 
-        return out;
+        return out.toString();
     }
 }
 
@@ -318,5 +323,5 @@ public class Smsc {
         sd.send_sms("79999999999", "Ваш пароль: 123", 1, "", "", 0, "", "");
         sd.get_sms_cost("79999999999", "Вы успешно зарегистрированы!", 0, 0, "", "");
         sd.get_status(sms_id, "79999999999");
-        sd.get_balanse();
+        sd.get_balance();
 */

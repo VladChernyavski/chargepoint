@@ -20,4 +20,6 @@ public class ConnectorStatusEntity {
     @Enumerated(EnumType.STRING)
     private ConnectorStatus name;
 
+    // connectorStatusToConnectorStatusEntity in ConnectorStatusService
+
 }

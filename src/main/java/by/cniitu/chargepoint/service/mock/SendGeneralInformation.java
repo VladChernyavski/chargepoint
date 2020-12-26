@@ -67,11 +67,12 @@ public class SendGeneralInformation{
             Integer id = entity.getId();
             if (randomNum == 0 && !normalChargePointIds.contains(id)) {
 
-                List<ConnectorEntity> connectors = entity.getConnectors();
+                List<ConnectorEntity> connectors = connectorService.getConnectors(entity.getId());
                 int connectorNumber = random.nextInt(connectors.size()); // 0 or 1
                 ConnectorEntity connectorEntity = connectors.get(connectorNumber);
                 ConnectorStatus nextConnectorStatus = nextStatus.get(connectorEntity.getStatus().getName());
-                ConnectorStatusEntity connectorStatusEntity = connectorStatusService.findByName(nextConnectorStatus);
+                ConnectorStatusEntity connectorStatusEntity =
+                        connectorStatusService.connectorStatusToConnectorStatusEntity(nextConnectorStatus);
                 connectorEntity.setStatus(connectorStatusEntity);
                 connectorService.save(connectorEntity);
                 updatesIds.add(id);

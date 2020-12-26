@@ -4,13 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/*
-{
-            "tittle": "String",
-            "address": "String",
-            "worktime": "String"
-         }
-*/
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -20,12 +13,12 @@ public class Properties {
     private String address;
 
     // TODO discuss the necessity
-    private String worktime;
+    private String workTime;
 
     public Properties(Properties properties){
         this.tittle = properties.tittle;
         this.address = properties.address;
-        this.worktime = properties.worktime;
+        this.workTime = properties.workTime;
     }
 
 }

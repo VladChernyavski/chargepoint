@@ -1,18 +1,15 @@
 package by.cniitu.chargepoint.web.controller;
 
 import by.cniitu.chargepoint.entity.User;
+import by.cniitu.chargepoint.entity.connector.ConnectorEntity;
 import by.cniitu.chargepoint.model.ChargePoint;
 import by.cniitu.chargepoint.model.request.*;
 import by.cniitu.chargepoint.model.web.action.ChargeAction;
 import by.cniitu.chargepoint.model.web.action.ReserveAction;
 import by.cniitu.chargepoint.model.web.action.UserActionTo;
-import by.cniitu.chargepoint.model.web.map.Connector;
-import by.cniitu.chargepoint.service.ChargePointService;
-import by.cniitu.chargepoint.service.ConnectorService;
-import by.cniitu.chargepoint.service.UserActionService;
-import by.cniitu.chargepoint.service.UserService;
+import by.cniitu.chargepoint.service.*;
 import by.cniitu.chargepoint.service.enums.ConnectorStatus;
-import by.cniitu.chargepoint.service.websocket.ServerWebSocket;
+import by.cniitu.chargepoint.service.enums.UserActionEnum;
 import by.cniitu.chargepoint.util.JsonUtil;
 import org.java_websocket.WebSocket;
 import org.springframework.http.HttpStatus;
@@ -22,29 +19,34 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/chargePoint/{id}")
+@RequestMapping("/chargePoint/{chargePointId}")
 @CrossOrigin("*")
 // TODO add more tokens to everything
 public class ChargePointController {
 
+    // serverWebSocket should not be here
     final ChargePointService chargePointService;
-    final ServerWebSocket serverWebSocket;
     final UserActionService userActionService;
     final UserService userService;
     final ConnectorService connectorService;
+    final ConnectorStatusService connectorStatusService;
+    final TransactionService transactionService;
 
-    public ChargePointController(ChargePointService chargePointService, ServerWebSocket serverWebSocket, UserActionService userActionService, UserService userService, ConnectorService connectorService) {
+    public ChargePointController(ChargePointService chargePointService, UserActionService userActionService,
+                                 UserService userService, ConnectorService connectorService,
+                                 ConnectorStatusService connectorStatusService, TransactionService transactionService) {
         this.chargePointService = chargePointService;
-        this.serverWebSocket = serverWebSocket;
         this.userActionService = userActionService;
         this.userService = userService;
         this.connectorService = connectorService;
+        this.connectorStatusService = connectorStatusService;
+        this.transactionService = transactionService;
     }
 
     // TODO something with this
     @PostMapping("/reserveNow")
-    public ResponseEntity<Object> reserveNow(@PathVariable int id, @RequestBody ReserveNowRequest request) {
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> reserveNow(@PathVariable int chargePointId, @RequestBody ReserveNowRequest request) {
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "ReserveNow", request);
 
@@ -57,8 +59,8 @@ public class ChargePointController {
 
     // TODO something with this
     @PostMapping("/cancelReservation")
-    public ResponseEntity<Object> cancelReservation(@PathVariable int id, @RequestBody CancelReservationRequest request) {
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> cancelReservation(@PathVariable int chargePointId, @RequestBody CancelReservationRequest request) {
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "CancelReservation", request);
 
@@ -71,8 +73,8 @@ public class ChargePointController {
 
     // TODO charge point not support
     @PostMapping("/changeAvailability")
-    public ResponseEntity<Object> changeAvailability(@PathVariable int id, @RequestBody ChangeAvailabilityRequest request) {
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> changeAvailability(@PathVariable int chargePointId, @RequestBody ChangeAvailabilityRequest request) {
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "ChangeAvailability", request);
 
@@ -85,8 +87,8 @@ public class ChargePointController {
 
     // TODO charge point not support
     @PostMapping("/changeConfiguration")
-    public ResponseEntity<Object> changeConfiguration(@PathVariable int id, @RequestBody ChangeConfigurationRequest request) {
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> changeConfiguration(@PathVariable int chargePointId, @RequestBody ChangeConfigurationRequest request) {
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "ChangeConfiguration", request);
 
@@ -99,8 +101,8 @@ public class ChargePointController {
 
     // TODO charge point not support
     @PostMapping("/clearCache")
-    public ResponseEntity<Object> clearCache(@PathVariable int id, @RequestBody ClearCacheRequest request) {
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> clearCache(@PathVariable int chargePointId, @RequestBody ClearCacheRequest request) {
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "ClearCache", request);
 
@@ -113,8 +115,8 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/clearChargingProfile")
-    public ResponseEntity<Object> clearChargingProfile(@PathVariable int id, @RequestBody ClearChargingProfileRequest request) {
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> clearChargingProfile(@PathVariable int chargePointId, @RequestBody ClearChargingProfileRequest request) {
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "ClearChargingProfile", request);
 
@@ -127,8 +129,8 @@ public class ChargePointController {
 
     // TODO something with this
     @PostMapping("/dataTransfer")
-    public ResponseEntity<Object> dataTransfer(@PathVariable int id, @RequestBody DataTransferRequest request) {
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> dataTransfer(@PathVariable int chargePointId, @RequestBody DataTransferRequest request) {
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "DataTransfer", request);
 
@@ -141,8 +143,8 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/getCompositeSchedule")
-    public ResponseEntity<Object> getCompositeSchedule(@PathVariable int id, @RequestBody GetCompositeScheduleRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> getCompositeSchedule(@PathVariable int chargePointId, @RequestBody GetCompositeScheduleRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "GetCompositeSchedule", request);
 
@@ -155,8 +157,8 @@ public class ChargePointController {
 
     // TODO charge point not support
     @PostMapping("/getConfiguration")
-    public ResponseEntity<Object> getConfiguration(@PathVariable int id, @RequestBody GetConfigurationRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> getConfiguration(@PathVariable int chargePointId, @RequestBody GetConfigurationRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "GetConfiguration", request);
 
@@ -169,8 +171,8 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/getDiagnostics")
-    public ResponseEntity<Object> getDiagnostics(@PathVariable int id, @RequestBody GetDiagnosticsRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> getDiagnostics(@PathVariable int chargePointId, @RequestBody GetDiagnosticsRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "GetDiagnostics", request);
 
@@ -183,8 +185,8 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/getLocalListVersion")
-    public ResponseEntity<Object> getLocalListVersion(@PathVariable int id, @RequestBody GetLocalListVersionRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> getLocalListVersion(@PathVariable int chargePointId, @RequestBody GetLocalListVersionRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "GetLocalListVersion", request);
 
@@ -197,8 +199,8 @@ public class ChargePointController {
 
     // TODO something with this
     @PostMapping("/remoteStartTransaction")
-    public ResponseEntity<Object> remoteStartTransaction(@PathVariable int id, @RequestBody RemoteStartTransactionRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> remoteStartTransaction(@PathVariable int chargePointId, @RequestBody RemoteStartTransactionRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "RemoteStartTransaction", request);
 
@@ -211,8 +213,8 @@ public class ChargePointController {
 
     // TODO something with this
     @PostMapping("/remoteStopTransaction")
-    public ResponseEntity<Object> remoteStopTransaction(@PathVariable int id, @RequestBody RemoteStopTransactionRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> remoteStopTransaction(@PathVariable int chargePointId, @RequestBody RemoteStopTransactionRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "RemoteStopTransaction", request);
 
@@ -225,8 +227,8 @@ public class ChargePointController {
 
     // TODO something with this
     @PostMapping("/reset")
-    public ResponseEntity<Object> reset(@PathVariable int id, @RequestBody ResetRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> reset(@PathVariable int chargePointId, @RequestBody ResetRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "Reset", request);
 
@@ -239,8 +241,8 @@ public class ChargePointController {
 
     // TODO test
     @PostMapping("/sendLocalList")
-    public ResponseEntity<Object> sendLocalList(@PathVariable int id, @RequestBody SendLocalListRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> sendLocalList(@PathVariable int chargePointId, @RequestBody SendLocalListRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "SendLocalList", request);
 
@@ -253,8 +255,8 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/setChargingProfile")
-    public ResponseEntity<Object> setChargingProfile(@PathVariable int id, @RequestBody SetChargingProfileRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> setChargingProfile(@PathVariable int chargePointId, @RequestBody SetChargingProfileRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "SetChargingProfile", request);
 
@@ -267,8 +269,8 @@ public class ChargePointController {
 
     // TODO not implemented by charge point
     @PostMapping("/triggerMessage")
-    public ResponseEntity<Object> triggerMessage(@PathVariable int id, @RequestBody TriggerMessageRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> triggerMessage(@PathVariable int chargePointId, @RequestBody TriggerMessageRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "TriggerMessage", request);
 
@@ -281,8 +283,8 @@ public class ChargePointController {
 
     // TODO something with this
     @PostMapping("/unlockConnector")
-    public ResponseEntity<Object> unlockConnector(@PathVariable int id, @RequestBody UnlockConnectorRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> unlockConnector(@PathVariable int chargePointId, @RequestBody UnlockConnectorRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "UnlockConnector", request);
 
@@ -295,8 +297,8 @@ public class ChargePointController {
 
     // TODO test
     @PostMapping("/updateFirmware")
-    public ResponseEntity<Object> updateFirmware(@PathVariable int id, @RequestBody UpdateFirmwareRequest request){
-        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(id);
+    public ResponseEntity<Object> updateFirmware(@PathVariable int chargePointId, @RequestBody UpdateFirmwareRequest request){
+        WebSocket webSocket = ChargePoint.websocketByChargePointId.get(chargePointId);
 
         Object[] requestObject = getRequestObject(2, UUID.randomUUID().toString(), "UpdateFirmware", request);
 
@@ -315,65 +317,33 @@ public class ChargePointController {
 
     // TODO delete after development
     // manually changing off connector state
-    @PostMapping("/status/{conId}/{status}")
-    public ResponseEntity<Object> status(@PathVariable Integer id, @PathVariable Integer conId,
+    @PostMapping("/status/{connectorNumber}/{status}")
+    public ResponseEntity<Object> status(@PathVariable Integer chargePointId, @PathVariable Integer connectorNumber,
                                         @PathVariable String status) {
 
-        Connector connector;
+        ConnectorEntity connectorEntity;
         try {
-            connector = connectorService.getConnector(id, conId);
-        } catch (Exception ex){
+            connectorEntity = connectorService.getConnector(chargePointId, connectorNumber);
+            connectorEntity.setStatus(connectorStatusService.connectorStatusToConnectorStatusEntity(ConnectorStatus.get(status)));
+        } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
         }
 
-        connector.setStatus(ConnectorStatus.get(status));
-        serverWebSocket.broadcastUpdate(id);
+        connectorService.save(connectorEntity);
+        chargePointService.broadcastUpdate(chargePointId);
         return ResponseEntity.ok("{\"message\": \"status is changed\"}");
     }
 
+    // TODO connect it to real chargePoint, start charging process
+    // TODO connect it to real chargePoint, may be lock the connector
     /**
-     * the start of charging process
-     * if the status of the connector is green (work) -> ask the user to connect the connector
-     * if the status of the connector is yellow (connected) -> start charging
-     * otherwise we cannot start charging
-     * @param id - charge point id
+     * the start of reserving or charging process
+     * @param chargePointId - charge point id
+     * @param param - energy of totalSeconds
      * */
-    @PostMapping("/start/charge/{conId}/{userId}")
-    public ResponseEntity<Object> start(@PathVariable Integer id, @PathVariable Integer conId,
-                                        @PathVariable Integer userId, @RequestParam Double energy) throws Exception {
-
-        // TODO check the existence of the user using database
-        // TODO check the balance and save transactions even when the time was 0 (when the client had not enough money)
-
-        Connector connector;
-        try {
-            connector = connectorService.getConnector(id, conId);
-        } catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
-        }
-        ConnectorStatus status = connector.getStatus();
-        if (status == ConnectorStatus.WORK) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body("{\"message\": \"please connect the connector and try again\", \"status\": \"plug\"}");
-        } else if (status== ConnectorStatus.CONNECTED) {
-            // TODO add transaction ID
-            UserActionService.userActionMap.put(userId, new UserActionTo(id, conId, new ChargeAction(energy), 0));
-
-            // TODO save start of transaction to database end somehow finish transaction
-            connector.setStatus(ConnectorStatus.BUSY);
-            serverWebSocket.broadcastUpdate(id);
-            return ResponseEntity.ok("{\"message\": \"charging is started\", \"status\": \"ok\"}");
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"charging process is now unavailable\"}");
-    }
-
-    /**
-     * the start of reserving process
-     * @param id - charge point id
-     * */
-    @PostMapping("/start/reserve/{conId}/{userId}")
-    public ResponseEntity<Object> start(@PathVariable Integer id, @PathVariable Integer conId,
-                                        @PathVariable Integer userId, @RequestParam Integer totalSeconds) throws Exception {
+    @PostMapping("/start/{action}/{conId}/{userId}")
+    public ResponseEntity<Object> start(@PathVariable Integer chargePointId, @PathVariable String action,
+                                        @PathVariable Integer conId, @PathVariable Integer userId, @RequestParam Double param) throws Exception {
 
         // check the existence of the user using database
         User user = userService.findOneById(userId);
@@ -381,26 +351,52 @@ public class ChargePointController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown user id\", \"status\": \" not ok\"}");
         }
 
-        // TODO check the balance and save transactions even when the time was 0 (when the client had not enough money)
-
-
-        Connector connector;
+        if(userActionService.containsKey(userId)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"finish already started transaction firstly\", \"status\": \" not ok\"}");
+        }
+        ConnectorEntity connectorEntity;
         try {
-            connector = connectorService.getConnector(id, conId);
+            connectorEntity = connectorService.getConnector(chargePointId, conId);
         } catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
         }
-        if (connector.getStatus() == ConnectorStatus.WORK) {
-            // TODO add transaction ID
-            UserActionService.userActionMap.put(userId, new UserActionTo(id, conId, new ReserveAction(totalSeconds),  0));
-
-            // TODO save start of transaction to database end somehow finish transaction
-            connector.setStatus(ConnectorStatus.RESERVED);
-            serverWebSocket.broadcastUpdate(id);
-            return ResponseEntity.ok("{\"message\": \"reservation is started\", \"status\": \"ok\"}");
+        if(action.equals("reserve")) {
+            double tariff = connectorEntity.getTariff().getReserve();
+            int totalSeconds = (int) param.doubleValue();
+            if (user.getMoney() < ((double) totalSeconds / 60) * tariff) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"not enough money\", \"status\": \" not ok\"}");
+            }
+            if (connectorEntity.getStatus().getName() == ConnectorStatus.WORK) {
+                Integer transactionId = transactionService.startTransaction(UserActionEnum.RESERVE, user, tariff, connectorEntity);
+                userActionService.put(userId, new UserActionTo(chargePointId, conId,
+                        new ReserveAction(totalSeconds), transactionId));
+                connectorEntity.setStatus(connectorStatusService.connectorStatusToConnectorStatusEntity(ConnectorStatus.RESERVED));
+                connectorService.save(connectorEntity);
+                chargePointService.broadcastUpdate(chargePointId);
+                return ResponseEntity.ok("{\"message\": \"reservation is started\", \"status\": \"ok\"}");
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"reservation process is now unavailable\"}");
+        } else if (action.equals("charge")) {
+            double energy = param;
+            double tariff = connectorEntity.getTariff().getCharge();
+            if(user.getMoney() < energy * tariff) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"not enough money\", \"status\": \" not ok\"}");
+            }
+            ConnectorStatus status = connectorEntity.getStatus().getName();
+            if (status == ConnectorStatus.WORK) {
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body("{\"message\": \"please connect the connector and try again\", \"status\": \"plug\"}");
+            } else if (status== ConnectorStatus.CONNECTED) {
+                Integer transactionId = transactionService.startTransaction(UserActionEnum.CHARGE, user, tariff, connectorEntity);
+                userActionService.put(userId, new UserActionTo(chargePointId, conId, new ChargeAction(energy), transactionId));
+                connectorEntity.setStatus(connectorStatusService.connectorStatusToConnectorStatusEntity(ConnectorStatus.BUSY));
+                connectorService.save(connectorEntity);
+                chargePointService.broadcastUpdate(chargePointId);
+                return ResponseEntity.ok("{\"message\": \"charging is started\", \"status\": \"ok\"}");
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"charging process is now unavailable\"}");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown action\", \"status\": \" not ok\"}");
         }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"reservation process is now unavailable\"}");
     }
 
 }

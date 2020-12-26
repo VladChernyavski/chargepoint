@@ -8,4 +8,7 @@ public abstract class UserAction{
 
     abstract void finish();
 
+    // get tariff param (minutes or kWh)
+    abstract double getTariffParam();
+
 }

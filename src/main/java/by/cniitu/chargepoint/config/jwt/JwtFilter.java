@@ -2,7 +2,6 @@ package by.cniitu.chargepoint.config.jwt;
 
 import by.cniitu.chargepoint.entity.User;
 import by.cniitu.chargepoint.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -21,11 +20,13 @@ public class JwtFilter extends GenericFilterBean {
 
     public static final String AUTHORIZATION = "Authorization";
 
-    @Autowired
-    private JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public JwtFilter(JwtProvider jwtProvider, UserService userService) {
+        this.jwtProvider = jwtProvider;
+        this.userService = userService;
+    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,

@@ -3,6 +3,7 @@ package by.cniitu.chargepoint.entity.connector;
 import by.cniitu.chargepoint.entity.ChargePointEntity;
 import by.cniitu.chargepoint.entity.Tariff;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.ToString;
 
@@ -22,13 +23,14 @@ public class ConnectorEntity {
     @Column(name = "number")
     private Integer number;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "status_id")
     private ConnectorStatusEntity status;
 
     @ManyToOne
     @JoinColumn(name = "type_id")
-    private ConnectorType type;
+    private ConnectorTypeEntity type;
 
     @Column(name = "power")
     private Double power;

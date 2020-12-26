@@ -1,13 +1,9 @@
 package by.cniitu.chargepoint.entity;
 
-import by.cniitu.chargepoint.entity.connector.ConnectorEntity;
-
 import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
-
-import java.util.List;
 
 @Entity
 @Table(name = "charge_point")
@@ -43,8 +39,8 @@ public class ChargePointEntity {
     private String address;
 
     // TODO ask if it will be used correctly
-    @Column(name = "worktime")
-    private String worktime;
+    @Column(name = "work_time")
+    private String workTime;
 
     @Column(name = "latitude")
     private Double latitude;
@@ -52,7 +48,9 @@ public class ChargePointEntity {
     @Column(name = "longitude")
     private Double longitude;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "chargePoint", cascade = CascadeType.ALL)
-    private List<ConnectorEntity> connectors;
+    /* something went wrong
+     @OneToMany(fetch = FetchType.EAGER, mappedBy = "chargePoint", cascade = CascadeType.ALL)
+     private List<ConnectorEntity> connectors;
+    */
 
 }

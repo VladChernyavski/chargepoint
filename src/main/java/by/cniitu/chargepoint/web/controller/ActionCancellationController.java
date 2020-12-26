@@ -1,6 +1,5 @@
 package by.cniitu.chargepoint.web.controller;
 
-import by.cniitu.chargepoint.model.web.action.UserActionTo;
 import by.cniitu.chargepoint.service.UserActionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +10,12 @@ import org.springframework.web.bind.annotation.*;
 // TODO add more tokens to everything
 public class ActionCancellationController {
 
+    final UserActionService userActionService;
+
+    public ActionCancellationController(UserActionService userActionService){
+        this.userActionService = userActionService;
+    }
+
     /**
      * the end of charging or reservation process
      *
@@ -19,11 +24,10 @@ public class ActionCancellationController {
      * */
     @PostMapping("/end/{userId}")
     public ResponseEntity<Object> end(@PathVariable Integer userId) {
-        UserActionTo userActionTo = UserActionService.userActionMap.get(userId);
-        if(userActionTo == null){
+        if(!userActionService.containsKey(userId)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown user id\", \"status\": \" not ok\"}");
         }
-        userActionTo.finish();
+        userActionService.finish(userId);
         return ResponseEntity.ok("{\"message\": \"ok\", \"status\": \"ok\"}");
     }
 }

@@ -1,17 +1,19 @@
 package by.cniitu.chargepoint.entity.transaction;
 
 import by.cniitu.chargepoint.entity.User;
-import by.cniitu.chargepoint.entity.transaction.TransactionType;
+import by.cniitu.chargepoint.entity.connector.ConnectorEntity;
 import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transaction")
 @Data
 @ToString
+@Transactional
 public class Transaction {
 
     @Id
@@ -28,8 +30,9 @@ public class Transaction {
     @JoinColumn(name = "transaction_type_id")
     private TransactionType transactionType;
 
-    @Column(name = "total_time")
-    private LocalDateTime totalTime;
+    // TODO understand how to work with postgresql interval
+    @Column(name = "total_milliseconds")
+    private Long totalMilliseconds;
 
     @Column(name = "start_money")
     private Double startMoney;
@@ -43,12 +46,16 @@ public class Transaction {
     @Column(name = "used_energy")
     private Double usedEnergy;
 
-    @Column(name = "tariff_per_hour")
-    private Double tariffPerHour;
+    @Column(name = "tariff")
+    private Double tariff;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "connector_id")
+    private ConnectorEntity connectorEntity;
 
 
 }

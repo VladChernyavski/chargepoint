@@ -1,3 +1,5 @@
+-- TODO add creation of all the tables
+
 CREATE TABLE user_table
 (
     id           SERIAL PRIMARY KEY,

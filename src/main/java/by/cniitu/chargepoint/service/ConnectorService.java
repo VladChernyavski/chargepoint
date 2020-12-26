@@ -2,27 +2,38 @@ package by.cniitu.chargepoint.service;
 
 import by.cniitu.chargepoint.entity.connector.ConnectorEntity;
 import by.cniitu.chargepoint.repository.ConnectorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
-import by.cniitu.chargepoint.model.web.map.Connector;
+import java.util.List;
 
 @Service
 public class ConnectorService {
 
-    @Autowired
-    ConnectorRepository connectorRepository;
+    final ConnectorRepository connectorRepository;
+
+    public ConnectorService(ConnectorRepository connectorRepository) {
+        this.connectorRepository = connectorRepository;
+    }
 
     /**
      * /
-     * @param chargePointId
+     * @param chargePointId -- chargePointId
      * @param connectorNumber --  1 or 2
      * @return the connector from database
-     * @throws Exception -- unknown connector id
+     * @throws NotFoundException -- unknown connector id
      */
-    public Connector getConnector(Integer chargePointId, Integer connectorNumber) {
+    public ConnectorEntity getConnector(Integer chargePointId, Integer connectorNumber) throws NotFoundException {
+        List<ConnectorEntity> connectorEntities = getConnectors(chargePointId);
+        for(ConnectorEntity connectorEntity: connectorEntities){
+            if(connectorEntity.getNumber().equals(connectorNumber)){
+                return connectorEntity;
+            }
+        }
+        throw new NotFoundException("there is not such connector");
+    }
 
-        // TODO get real values from database
-        return null;
+    public List<ConnectorEntity> getConnectors(Integer chargePointId) {
+        return connectorRepository.getConnectors(chargePointId);
     }
 
     public void save(ConnectorEntity connectorEntity){

@@ -7,40 +7,6 @@ import lombok.NoArgsConstructor;
 import java.util.LinkedList;
 import java.util.List;
 
-import java.util.Map;
-
-/*
- {
-         "id": 1,
-         "properties": {
-            "tittle": "String",
-            "address": "String",
-            "worktime": "String"
-         },
-         "connectors": [
-            {
-                "number": 1,
-                "status": "work",
-                "type": "string",
-                "power": "string"
-            },
-            {
-                "number": 2,
-                "status": "service",
-                "type": "string",
-                "power": "string"
-            }
-         ],
-         "geometry": {
-            "type": "Point",
-            "coordinates": [
-                27.58,
-                53.89
-            ]
-         }
-}
-         */
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

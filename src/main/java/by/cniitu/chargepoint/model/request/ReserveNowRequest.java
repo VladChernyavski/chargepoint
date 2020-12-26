@@ -3,9 +3,6 @@ package by.cniitu.chargepoint.model.request;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Calendar;
-
-
 /**
  * Sent by the Central System to the Charge Point.
  */

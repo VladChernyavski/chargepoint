@@ -1,5 +1,6 @@
 package by.cniitu.chargepoint.entity.transaction;
 
+import by.cniitu.chargepoint.service.enums.UserActionEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,11 +20,12 @@ public class TransactionType {
     private Integer id;
 
     @Column(name = "name")
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private UserActionEnum name;
 
-    @Override
+    // it is used
     @JsonValue
-    public String toString(){
+    public UserActionEnum toJson(){
         return name;
     }
 

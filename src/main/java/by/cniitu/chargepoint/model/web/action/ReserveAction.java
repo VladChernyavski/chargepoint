@@ -42,4 +42,9 @@ public class ReserveAction extends UserAction{
     void finish() {
         shouldBeFinished = true;
     }
+
+    @Override
+    double getTariffParam() {
+        return (double)currentSeconds / 60;
+    }
 }

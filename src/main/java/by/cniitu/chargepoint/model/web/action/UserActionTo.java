@@ -22,6 +22,10 @@ public class UserActionTo {
         return this;
     }
 
+    public double getTariffParam(){
+        return userAction.getTariffParam();
+    }
+
     public void finish(){
         userAction.finish();
     }

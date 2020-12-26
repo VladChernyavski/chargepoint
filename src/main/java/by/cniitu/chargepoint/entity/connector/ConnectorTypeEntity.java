@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "connector_type")
 @Data
-public class ConnectorType {
+public class ConnectorTypeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

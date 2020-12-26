@@ -8,9 +8,6 @@ import eu.chargetime.ocpp.model.core.AuthorizationStatus;
 import eu.chargetime.ocpp.model.core.DataTransferStatus;
 import eu.chargetime.ocpp.model.core.IdTagInfo;
 import eu.chargetime.ocpp.model.core.RegistrationStatus;
-import eu.chargetime.ocpp.model.reservation.CancelReservationStatus;
-import eu.chargetime.ocpp.model.reservation.ReservationStatus;
-import lombok.Getter;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -24,9 +21,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
 @Service
-public class ServerOcppSocket extends WebSocketServer {
+public class ServerOCPPSocket extends WebSocketServer {
 
-    public ServerOcppSocket(@Value("${websocket.ocpp.port}") int port) {
+    public ServerOCPPSocket(@Value("${websocket.ocpp.port}") int port) {
         super(new InetSocketAddress(port));
     }
 
@@ -37,7 +34,7 @@ public class ServerOcppSocket extends WebSocketServer {
 
     @Override
     public void onStart() {
-        System.out.println("ServerOcppSocket onStart");
+        System.out.println("ServerOCPPSocket onStart");
     }
 
     @Override
