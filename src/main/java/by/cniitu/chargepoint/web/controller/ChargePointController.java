@@ -54,6 +54,7 @@ public class ChargePointController {
         System.out.println("HTTP request (ReserveNow) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -68,6 +69,7 @@ public class ChargePointController {
         System.out.println("HTTP request (CancelReservation) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -82,6 +84,7 @@ public class ChargePointController {
         System.out.println("HTTP request (ChangeAvailability) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -96,6 +99,7 @@ public class ChargePointController {
         System.out.println("HTTP request (ChangeConfiguration) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -110,6 +114,7 @@ public class ChargePointController {
         System.out.println("HTTP request (ClearCache) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -124,6 +129,7 @@ public class ChargePointController {
         System.out.println("HTTP request (ClearChargingProfile) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -138,6 +144,7 @@ public class ChargePointController {
         System.out.println("HTTP request (DataTransfer) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -152,6 +159,7 @@ public class ChargePointController {
         System.out.println("HTTP request (GetCompositeSchedule) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -166,6 +174,7 @@ public class ChargePointController {
         System.out.println("HTTP request (GetConfiguration) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -180,6 +189,7 @@ public class ChargePointController {
         System.out.println("HTTP request (GetDiagnostics) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -194,6 +204,7 @@ public class ChargePointController {
         System.out.println("HTTP request (GetLocalListVersion) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -208,6 +219,7 @@ public class ChargePointController {
         System.out.println("HTTP request (RemoteStartTransaction) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -222,6 +234,7 @@ public class ChargePointController {
         System.out.println("HTTP request (RemoteStopTransaction) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -236,6 +249,7 @@ public class ChargePointController {
         System.out.println("HTTP request (Reset) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -250,6 +264,7 @@ public class ChargePointController {
         System.out.println("HTTP request (SendLocalList) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -264,6 +279,7 @@ public class ChargePointController {
         System.out.println("HTTP request (SetChargingProfile) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -278,6 +294,7 @@ public class ChargePointController {
         System.out.println("HTTP request (TriggerMessage) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -292,6 +309,7 @@ public class ChargePointController {
         System.out.println("HTTP request (UnlockConnector) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -306,6 +324,7 @@ public class ChargePointController {
         System.out.println("HTTP request (UpdateFirmware) = " + JsonUtil.getJsonString(requestObject));
 
         webSocket.send(JsonUtil.getJsonString(requestObject));
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"success\"}");
     }
 
@@ -326,11 +345,13 @@ public class ChargePointController {
             connectorEntity = connectorService.getConnector(chargePointId, connectorNumber);
             connectorEntity.setStatus(connectorStatusService.connectorStatusToConnectorStatusEntity(ConnectorStatus.get(status)));
         } catch (Exception ex) {
+            // TODO maybe make a toast
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
         }
 
         connectorService.save(connectorEntity);
         chargePointService.broadcastUpdate(chargePointId);
+        // TODO maybe make a toast
         return ResponseEntity.ok("{\"message\": \"status is changed\"}");
     }
 
@@ -348,23 +369,29 @@ public class ChargePointController {
         // check the existence of the user using database
         User user = userService.findOneById(userId);
         if(user == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown user id\", \"status\": \" not ok\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown user id\"," +
+                    "\"status\": \" not ok\", \"toast\": \"unknownUserId\"}");
         }
 
         if(userActionService.containsKey(userId)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"finish already started transaction firstly\", \"status\": \" not ok\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "{\"message\": \"please finish already started transaction firstly\"," +
+                            "\"status\": \" not ok\", \"toast\": \"pleaseFinishAlreadyStartedTransactionFirstly\"}"
+            );
         }
         ConnectorEntity connectorEntity;
         try {
             connectorEntity = connectorService.getConnector(chargePointId, conId);
         } catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"" + ex.getMessage() +"\"," +
+                    " \"status\": \"not ok\", \"toast\": \"unknownError\"}");
         }
         if(action.equals("reserve")) {
             double tariff = connectorEntity.getTariff().getReserve();
             int totalSeconds = (int) param.doubleValue();
             if (user.getMoney() < ((double) totalSeconds / 60) * tariff) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"not enough money\", \"status\": \" not ok\"}");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"not enough money\"," +
+                        "\"status\": \" not ok\", \"toast\": \"notEnoughMoney\"}");
             }
             if (connectorEntity.getStatus().getName() == ConnectorStatus.WORK) {
                 Integer transactionId = transactionService.startTransaction(UserActionEnum.RESERVE, user, tariff, connectorEntity);
@@ -373,29 +400,39 @@ public class ChargePointController {
                 connectorEntity.setStatus(connectorStatusService.connectorStatusToConnectorStatusEntity(ConnectorStatus.RESERVED));
                 connectorService.save(connectorEntity);
                 chargePointService.broadcastUpdate(chargePointId);
-                return ResponseEntity.ok("{\"message\": \"reservation is started\", \"status\": \"ok\"}");
+                return ResponseEntity.ok("{\"message\": \"reservation is started\", \"status\": \"ok\"," +
+                        "\"toast\": \"reservationIsStarted\"}");
             }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"reservation process is now unavailable\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "{\"message\": \"reservation process is now unavailable\", \"status\": \"not ok\", " +
+                            "\"toast\": \"reservationProcessIsNowUnavailable\"}");
         } else if (action.equals("charge")) {
             double energy = param;
             double tariff = connectorEntity.getTariff().getCharge();
             if(user.getMoney() < energy * tariff) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"not enough money\", \"status\": \" not ok\"}");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"not enough money\"," +
+                        "\"status\": \" not ok\", \"toast\": \"notEnoughMoney\"}");
             }
             ConnectorStatus status = connectorEntity.getStatus().getName();
             if (status == ConnectorStatus.WORK) {
-                return ResponseEntity.status(HttpStatus.ACCEPTED).body("{\"message\": \"please connect the connector and try again\", \"status\": \"plug\"}");
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+                        "{\"message\": \"please connect the connector and try again\"," +
+                                "\"status\": \"plug\", \"toast\": \"pleaseConnectTheConnectorAndTryAgain\"}");
             } else if (status== ConnectorStatus.CONNECTED) {
                 Integer transactionId = transactionService.startTransaction(UserActionEnum.CHARGE, user, tariff, connectorEntity);
                 userActionService.put(userId, new UserActionTo(chargePointId, conId, new ChargeAction(energy), transactionId));
                 connectorEntity.setStatus(connectorStatusService.connectorStatusToConnectorStatusEntity(ConnectorStatus.BUSY));
                 connectorService.save(connectorEntity);
                 chargePointService.broadcastUpdate(chargePointId);
-                return ResponseEntity.ok("{\"message\": \"charging is started\", \"status\": \"ok\"}");
+                return ResponseEntity.ok("{\"message\": \"charging is started\", \"status\": \"ok\"," +
+                        "\"toast\": \"chargingIsStarted\"}");
             }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"charging process is now unavailable\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "{\"message\": \"charging process is now unavailable\", \"status\": \" not ok\"," +
+                            "\"toast\": \"chargingProcessIsNowUnavailable\"}");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown action\", \"status\": \" not ok\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown action\"," +
+                    "\"status\": \" not ok\", \"toast\": \"unknownAction\"}");
         }
     }
 

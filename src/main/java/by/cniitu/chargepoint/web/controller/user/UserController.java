@@ -38,28 +38,34 @@ public class UserController {
     public ResponseEntity<String> activate(@PathVariable String code) {
         User confirmedEmailUser = UserUtil.getUserByParseCode(code);
         if (confirmedEmailUser == null || confirmedEmailUser.getId() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Your link is invalid\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Your link is invalid\"," +
+                    "\"toast\": \"yourLinkIsInvalid\"}");
         }
         User user = userService.findUserByEmail(confirmedEmailUser.getEmail());
         user.setEmailConfirmed(true);
         userService.save(user);
-        return ResponseEntity.ok("{\"message\": \"Your email is confirmed\"}");
+        return ResponseEntity.ok("{\"message\": \"Your email is confirmed\", \"toast\": \"yourEmailIsConfirmed\"}");
     }
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerUserByPhone(@RequestBody RegisterRequest request) {
         User noConfirmUser = getUserByClaims(request.getToken(), "register");
         if (Objects.isNull(noConfirmUser)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Error\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Error\"," +
+                    "\"toast\": \"unknownError\"}");
         }
         if (userService.isPhoneNumberExist(noConfirmUser.getPhoneNumber())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"User with such phoneNumber exists\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "{\"message\": \"User with such phoneNumber exists\"," +
+                            "\"toast\": \"userWithSuchPhoneNumberExists\"}");
         }
         if (userService.isEmailExist(noConfirmUser.getEmail())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"User with such email exists\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "{\"message\": \"User with such email exists\"," +
+                            "\"toast\": \"userWithSuchEmailExists\"}");
         }
         MailThreadExecutorUtil.execute(() -> userService.confirmUserByPhone(noConfirmUser));
-        return ResponseEntity.ok("{\"message\": \"Ok. Check your phone please\"}");
+        return ResponseEntity.ok("{\"message\": \"Ok. Check your phone please\", \"toast\": \"pleaseCheckYourPhone\"}");
     }
 
     @PostMapping("/activate")
@@ -67,19 +73,22 @@ public class UserController {
         int code = request.getCode();
         User newUser = UserUtil.noConfirmedUsers.get(code);
         if(newUser == null || newUser.getId() == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Your code is invalid\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "{\"message\": \"Your code is invalid\", \"toast\": \"yourCodeIsInvalid\"}"
+            );
         }
         userService.create(newUser);
         UserUtil.noConfirmedUsers.remove(code, newUser);
         UserUtil.map.entrySet().removeIf(e -> e.getValue().equals(code));
-        return ResponseEntity.ok("{\"message\": \"Your phone is confirmed\"}");
+        return ResponseEntity.ok("{\"message\": \"Your phone is confirmed\", \"toast\": \"yourPhoneIsConfirmed\"}");
     }
 
     @PostMapping("/authByEmail")
     public ResponseEntity<Object> authByEmail(@RequestBody AuthRequest request ){
         User user = getUserByClaims(request.getToken(), "authByEmail");
         if (Objects.isNull(user)){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"message\": \"Error\"}");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"message\": \"Error\"," +
+                    "\"toast\": \"unknownError\"}");
         }
         String token = jwtProvider.generateToken(user.getEmail(), user.getPassword());
         AuthResponse response = new AuthResponse(user.getId(), token, user.getPhoneNumber(), user.getEmail(), user.getFirstName(),
@@ -93,7 +102,8 @@ public class UserController {
         User user = getUserByClaims(request.getToken(), "authByPhone");
 
         if (Objects.isNull(user)){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"message\": \"Error\"}");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"message\": \"Error\"," +
+                    "\"toast\": \"unknownError\"}");
         }
         String token = jwtProvider.generateToken(user.getPhoneNumber(), user.getPassword());
         AuthResponse response = new AuthResponse(user.getId(), token, user.getPhoneNumber(), user.getEmail(), user.getFirstName(),
@@ -160,9 +170,10 @@ public class UserController {
     public ResponseEntity<Object> getMoney(@PathVariable Integer userId) {
         User user = userService.findOneById(userId);
         if(user == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"No such user id\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"No such user id\"," +
+                    "\"toast\": \"unknownUserId\"}");
         }
-        return ResponseEntity.ok("{\"message\": " + (double)(int)(user.getMoney()*100)/100 +"}");
+        return ResponseEntity.ok("{\"message\": " + (double)(int)(user.getMoney()*100)/100 +", \"toast\": \"$$$\"}");
 
     }
 
@@ -170,10 +181,11 @@ public class UserController {
     public ResponseEntity<Object> changeMoney(@PathVariable Integer userId, @PathVariable Double amount) {
         User user = userService.findOneById(userId);
         if(user == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"No such user id\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"No such user id\"," +
+                    "\"toast\": \"unknownUserId\"}");
         }
         user = userService.changeMoney(user, amount);
-        return ResponseEntity.ok("{\"message\": " + user.getMoney() +"}");
+        return ResponseEntity.ok("{\"message\": " + user.getMoney() +", \"toast\": \"$$$\"}");
 
     }
 
@@ -183,24 +195,31 @@ public class UserController {
     public ResponseEntity<Object> changePassword(@PathVariable String email) {
         User user = userService.findUserByEmail(email);
         if (Objects.isNull(user)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Error\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Error\"," +
+                    "\"toast\": \"unknownError\"}");
         }
         String newPassword = RandomString.make();
         MailThreadExecutorUtil.execute(() -> userService.changeUserPassword(user, newPassword));
-        return ResponseEntity.ok("{\"message\": \"Success, check your email please.\"}");
+        return ResponseEntity.ok("{\"message\": \"Success, check your email please.\"," +
+                "\"toast\": \"pleaseCheckYourEmailPlease\"}");
     }
 
     @PostMapping("/verify/{email}")
     public ResponseEntity<Object> verifyEmail(@PathVariable String email) {
         User user = userService.findUserByEmail(email);
         if (Objects.isNull(user)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Error\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Error\"," +
+                    "\"toast\": \"unknownError\"}");
         }
         if(user.getEmailConfirmed()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Your e-mail is already verified\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    "{\"message\": \"Your e-mail is already verified\"," +
+                            "\"toast\": \"yourEmailIsAlreadyVerified\"}");
         }
         MailThreadExecutorUtil.execute(() -> userService.confirmUserByEmail(user));
-        return ResponseEntity.ok("{\"message\": \"Check your email please.\"}");
+        return ResponseEntity.ok(
+                "{\"message\": \"Check your email please.\", \"toast\": \"pleaseCheckYourEmailPlease\"}"
+        );
     }
 
     // TODO prepare all returned data before
@@ -218,7 +237,8 @@ public class UserController {
         if(size % Page.pageSize != 0)
             pageAmount++;
         if(page > pageAmount)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"No such page\"}");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"No such page\"," +
+                    "\"toast\": \"pageNotFound\"}");
         int fromIndex = (page - 1) * Page.pageSize;
         int toIndex = fromIndex + Page.pageSize;
         if(toIndex > size) {

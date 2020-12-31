@@ -25,9 +25,11 @@ public class ActionCancellationController {
     @PostMapping("/end/{userId}")
     public ResponseEntity<Object> end(@PathVariable Integer userId) {
         if(!userActionService.containsKey(userId)){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown user id\", \"status\": \" not ok\"}");
+            // TODO make a class with message, status and toast fields
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"unknown user id\"," +
+                    "\"status\": \" not ok\", \"toast\": \"unknownUserId\"}");
         }
         userActionService.finish(userId);
-        return ResponseEntity.ok("{\"message\": \"ok\", \"status\": \"ok\"}");
+        return ResponseEntity.ok("{\"message\": \"ok\", \"status\": \"ok\", \"toast\": \"transactionFinished\"}");
     }
 }

@@ -37,6 +37,9 @@ public class UserService {
     @PostConstruct
     void postConstruct() {
         // TODO prepare the pages of users here and than change them every time when userRepository is changed
+
+        System.out.println("passwordEncoder.encode(\"qwerty1234567890\") = " + passwordEncoder.encode("qwerty1234567890"));
+
     }
 
     public User findUserByEmail(String email) {
